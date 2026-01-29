@@ -1,0 +1,70 @@
+(honors) [rif17002@gpu45 honors_thesis]$ python train_brain_gnn_balanced.py 
+Using device: cuda
+
+==================================================
+Loading reward contrast dataset...
+==================================================
+Loaded 3705 subjects from labels file
+Found 2853 subjects with complete data
+
+Class distribution:
+  Class 0: 2543 (89.1%)
+  Class 1: 310 (10.9%)
+  Imbalance ratio: 8.20:1
+
+Number of ROIs (nodes): 352
+Number of node features: 6
+Number of edges: 123552
+
+Dataset split:
+  Train: 1825 samples
+  Val:   457 samples
+  Test:  571 samples
+  Train class dist: Class 0: 1627, Class 1: 198 (10.8% minority)
+  Val class dist: Class 0: 407, Class 1: 50 (10.9% minority)
+  Test class dist: Class 0: 509, Class 1: 62 (10.9% minority)
+
+Using oversampling for training set
+
+Initializing GCN model...
+Model parameters: 11,298
+
+==================================================
+Training model...
+Monitoring: balanced_acc
+==================================================
+Epoch 010: Train Loss: 0.4392, Train Acc: 0.5260, Train Balanced Acc: 0.5259 | Val Loss: 0.7061, Val Acc: 0.4508, Val Balanced Acc: 0.4811, Val F1: 0.1716, Val AUC: 0.4261
+Epoch 020: Train Loss: 0.4434, Train Acc: 0.5112, Train Balanced Acc: 0.5112 | Val Loss: 0.7178, Val Acc: 0.2757, Val Balanced Acc: 0.4443, Val F1: 0.1662, Val AUC: 0.4176
+Epoch 030: Train Loss: 0.4427, Train Acc: 0.5184, Train Balanced Acc: 0.5169 | Val Loss: 0.6946, Val Acc: 0.3764, Val Balanced Acc: 0.4481, Val F1: 0.1593, Val AUC: 0.4246
+Epoch 040: Train Loss: 0.4430, Train Acc: 0.5167, Train Balanced Acc: 0.4987 | Val Loss: 0.7277, Val Acc: 0.1422, Val Balanced Acc: 0.4746, Val F1: 0.1867, Val AUC: 0.4322
+Early stopping at epoch 49
+
+==================================================
+Evaluating on test set...
+==================================================
+
+Test Results:
+  Loss:              0.6444
+  Accuracy:          0.6935
+  Balanced Accuracy: 0.5802
+  F1 Score:          0.2358
+  AUC:               0.5773
+
+Classification Report:
+              precision    recall  f1-score   support
+
+     Class 0       0.91      0.72      0.81       509
+     Class 1       0.16      0.44      0.24        62
+
+    accuracy                           0.69       571
+   macro avg       0.54      0.58      0.52       571
+weighted avg       0.83      0.69      0.75       571
+
+
+Per-class metrics:
+  Class 0 - Precision: 0.9134, Recall: 0.7250
+  Class 1 - Precision: 0.1617, Recall: 0.4355
+Saved training history to training_history_reward.png
+Saved confusion matrix to confusion_matrix_reward.png
+
+Saved model to brain_gnn_reward_balanced.pt
