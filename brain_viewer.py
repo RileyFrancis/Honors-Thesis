@@ -18,41 +18,9 @@ class BrainViewer3D:
         self.df = None
         self.fig = None
         
-        if csv_path:
-            self.load_data(csv_path)
-        else:
-            # Load sample data if no path provided
-            self.load_sample_data()
+        self.load_data(csv_path)
     
-    def load_sample_data(self):
-        """Load sample Gordon ROI data"""
-        sample_data = """ROI_i,label,red,green,blue,alpha,gordon_group,x.mni,y.mni,z.mni,voxel_n
-1,1_L_Default,0,0,1,1.000,Default,-11.2,-52.4,36.5,
-2,2_L_SMhand,1,0,0,1.000,SMhand,-18.8,-48.7,65,
-3,3_L_SMmouth,0,1,0,1.000,SMmouth,-51.8,-7.8,38.5,
-4,4_L_Default,0,0,0.173,1.000,Default,-11.7,26.7,57,
-5,5_L_Visual,1,0.102,0.725,1.000,Visual,-18.4,-85.5,21.6,
-6,6_L_Default,1,0.827,0,1.000,Default,-47.2,-58,30.8,
-7,7_L_FrontoParietal,0,0.345,0,1.000,FrontoParietal,-38.1,48.8,10.5,
-8,8_L_Visual,0.518,0.518,1,1.000,Visual,-16.8,-60.1,-5.4,
-9,9_L_FrontoParietal,0.62,0.31,0.275,1.000,FrontoParietal,-55.9,-47.7,-9.3,
-10,10_L_Auditory,0,1,0.757,1.000,Auditory,-32,-29.3,15.6,
-11,11_L_None,0,0.518,0.584,1.000,None,-29.3,5.3,-27.4,
-12,12_L_CinguloParietal,0,0,0.482,1.000,CinguloParietal,-6.1,-26,28.5,
-13,13_L_Visual,0.863,0.078,0.235,1.000,Visual,-10.5,-95.8,0.7,
-14,14_L_Auditory,1,0.549,0,1.000,Auditory,-55.7,-35.7,13.7,
-15,15_L_SMhand,0.502,0.502,0,1.000,SMhand,-37.5,-26.9,56.4,
-16,16_L_CinguloOperc,0,1,1,1.000,CinguloOperc,-38.2,10.7,3.1,
-17,17_L_FrontoParietal,1,0.753,0.796,1.000,FrontoParietal,-42.3,34.8,27.9,
-18,18_L_Default,0.647,0.165,0.165,1.000,Default,-8.8,-54.6,26.5,
-19,19_L_Auditory,0.961,1,0.98,1.000,Auditory,-57.9,-19.8,8.8,
-20,20_R_SMhand,0.196,0.804,0.196,1.000,SMhand,23.3,-26.7,67.2"""
-        
-        from io import StringIO
-        self.df = pd.read_csv(StringIO(sample_data))
-        self._process_data()
-        print(f"Loaded sample data with {len(self.df)} ROIs")
-    
+
     def load_data(self, csv_path):
         """
         Load Gordon ROI data from CSV file
@@ -66,6 +34,43 @@ class BrainViewer3D:
         self._process_data()
         print(f"Loaded {len(self.df)} ROIs from {csv_path}")
     
+    def _get_group_colors(self):
+        """
+        Assign a consistent color to each Gordon group
+        
+        Returns:
+        --------
+        dict
+            Dictionary mapping group names to RGB color strings
+        """
+        # Define a color palette for the networks
+        # Using distinct, visually appealing colors
+        color_palette = [
+            'rgb(31, 119, 180)',   # Blue
+            'rgb(255, 127, 14)',   # Orange
+            'rgb(44, 160, 44)',    # Green
+            'rgb(214, 39, 40)',    # Red
+            'rgb(148, 103, 189)',  # Purple
+            'rgb(140, 86, 75)',    # Brown
+            'rgb(227, 119, 194)',  # Pink
+            'rgb(127, 127, 127)',  # Gray
+            'rgb(188, 189, 34)',   # Yellow-green
+            'rgb(23, 190, 207)',   # Cyan
+            'rgb(174, 199, 232)',  # Light blue
+            'rgb(255, 187, 120)',  # Light orange
+            'rgb(152, 223, 138)',  # Light green
+            'rgb(255, 152, 150)',  # Light red
+            'rgb(197, 176, 213)',  # Light purple
+        ]
+        
+        groups = sorted(self.df['gordon_group'].unique())
+        group_colors = {}
+        
+        for i, group in enumerate(groups):
+            group_colors[group] = color_palette[i % len(color_palette)]
+        
+        return group_colors
+    
     def _process_data(self):
         """Process and clean the loaded data"""
         # Remove rows with missing coordinates or group
@@ -77,11 +82,9 @@ class BrainViewer3D:
             if col in self.df.columns:
                 self.df[col] = self.df[col].str.strip()
         
-        # Create RGB color strings for plotly
-        self.df['color_rgb'] = self.df.apply(
-            lambda row: f"rgb({int(row['red']*255)}, {int(row['green']*255)}, {int(row['blue']*255)})",
-            axis=1
-        )
+        # Assign consistent colors per Gordon group
+        group_colors = self._get_group_colors()
+        self.df['color_rgb'] = self.df['gordon_group'].map(group_colors)
         
         # Create hover text
         self.df['hover_text'] = self.df.apply(
@@ -92,8 +95,7 @@ class BrainViewer3D:
                 f"MNI Coordinates:<br>"
                 f"  X: {row['x.mni']:.2f}<br>"
                 f"  Y: {row['y.mni']:.2f}<br>"
-                f"  Z: {row['z.mni']:.2f}<br>"
-                f"RGB: ({int(row['red']*255)}, {int(row['green']*255)}, {int(row['blue']*255)})"
+                f"  Z: {row['z.mni']:.2f}"
             ),
             axis=1
         )
@@ -122,11 +124,12 @@ class BrainViewer3D:
         # Create figure
         fig = go.Figure()
         
-        # Get unique groups
-        groups = self.df['gordon_group'].unique()
+        # Get unique groups and their colors
+        groups = sorted(self.df['gordon_group'].unique())
+        group_colors = self._get_group_colors()
         
         # Add a trace for each functional network
-        for group in sorted(groups):
+        for group in groups:
             group_data = self.df[self.df['gordon_group'] == group]
             
             fig.add_trace(go.Scatter3d(
@@ -137,7 +140,7 @@ class BrainViewer3D:
                 name=group,
                 marker=dict(
                     size=marker_size,
-                    color=group_data['color_rgb'],
+                    color=group_colors[group],  # Single color per group
                     line=dict(color='white', width=0.5),
                     opacity=0.9
                 ),
@@ -150,7 +153,7 @@ class BrainViewer3D:
         fig.update_layout(
             title=dict(
                 text='<b>Interactive 3D Brain ROI Viewer</b><br>'
-                     '<sub>Gordon Parcellation - MNI Coordinates</sub>',
+                     '<sub>Gordon ROI Parcellation (MNI Coordinates)</sub>',
                 x=0.5,
                 xanchor='center'
             ),
@@ -196,7 +199,7 @@ class BrainViewer3D:
                 borderwidth=1
             ),
             width=1400,
-            height=900,
+            height=1200,
             hovermode='closest',
             template='plotly_white'
         )
@@ -329,9 +332,9 @@ def example_save_html():
 
 
 if __name__ == "__main__":
-    # Example 1: Load sample data and save to HTML (for remote servers)
-    print("=== Example 1: Basic Viewer ===")
-    viewer = BrainViewer3D()
+    # Load the full dataset
+    print("=== Loading Brain ROI Data ===")
+    viewer = BrainViewer3D('/shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data/Gordon_ROI_Labels.csv')
     
     # Show network summary
     print("\nNetwork Summary:")
@@ -341,16 +344,3 @@ if __name__ == "__main__":
     print("\nSaving interactive plot to HTML...")
     viewer.save_html('brain_viewer_3d.html')
     print("✓ Done! Download 'brain_viewer_3d.html' and open in your browser.")
-    
-    # If you want to load your actual data file:
-    print("\n=== Loading your data file ===")
-    try:
-        viewer_full = BrainViewer3D('/shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data/Gordon_ROI_Labels.csv')
-        print("\nFull Dataset Network Summary:")
-        print(viewer_full.get_network_summary())
-        viewer_full.save_html('brain_viewer_full_data.html')
-        print("\n✓ Saved full dataset to 'brain_viewer_full_data.html'")
-    except FileNotFoundError:
-        print("\nNote: Full data file not found. Using sample data only.")
-    except Exception as e:
-        print(f"\nNote: Could not load full data file: {e}")
