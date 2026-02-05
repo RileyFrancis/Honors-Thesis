@@ -1,0 +1,50 @@
+# GNN Training Configuration File
+# Modify these parameters to customize your training
+
+# Data Configuration
+data:
+  data_dir: '/shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data'
+  labels_csv: '/shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/subject_lists/CBCL_PLPH_m0m24_MID_n3705.csv'
+  contrast_type: 'reward'  # 'reward' or 'loss'
+  threshold: 0.0  # Edge threshold (edges with |weight| < threshold are removed)
+  use_absolute: false  # Use absolute values of correlations
+
+# Model Architecture
+model:
+  gnn_type: 'GCN'  # 'GCN', 'GAT', or 'SAGE'
+  hidden_channels: 64
+  num_layers: 3
+  dropout: 0.4
+  pooling: 'mean'
+
+# Training Parameters
+training:
+  batch_size: 32
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  epochs: 200
+  patience: 50
+  test_size: 0.2
+  val_size: 0.2
+  random_seed: 0
+
+# Class Imbalance Handling
+imbalance:
+  use_class_weights: true  # Weight loss by inverse class frequency
+  use_focal_loss: true    # Use Focal Loss instead of CrossEntropy
+  focal_gamma: 1.5        # Focal loss focusing parameter (1.5-3.0)
+  use_oversampling: false  # Oversample minority class in training
+  monitor_metric: 'f1'  # 'balanced_acc', 'f1', 'auc', or 'acc'
+
+# Output Settings
+output:
+  save_model: true
+  model_filename: 'brain_gnn_{contrast_type}_balanced.pt'
+  training_history_plot: 'training_history_{contrast_type}.png'
+  confusion_matrix_plot: 'confusion_matrix_{contrast_type}.png'
+  verbose: true  # Print training progress
+
+# Device Settings
+device:
+  use_cuda: true  # Use GPU if available
+  cuda_device: 0  # GPU device ID (if multiple GPUs)

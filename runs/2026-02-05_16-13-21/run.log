@@ -1,0 +1,9 @@
+2026-02-05 16:13:21,856 - BrainGNN - INFO - ==================================================
+2026-02-05 16:13:21,857 - BrainGNN - INFO - Loading configuration from configs/diagnostic.yaml
+2026-02-05 16:13:21,857 - BrainGNN - INFO - ==================================================
+2026-02-05 16:13:21,859 - BrainGNN - INFO - Configuration loaded successfully
+2026-02-05 16:13:21,859 - BrainGNN - ERROR - An error occurred during training: 'NoneType' object is not subscriptable
+Traceback (most recent call last):
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 618, in main
+    data_config = config['data']
+TypeError: 'NoneType' object is not subscriptable

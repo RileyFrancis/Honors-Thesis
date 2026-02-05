@@ -1,0 +1,52 @@
+config:
+  data:
+    contrast_type: reward
+    data_dir: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data
+    labels_csv: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/subject_lists/CBCL_PLPH_m0m24_MID_n3705.csv
+    threshold: 0.0
+    use_absolute: false
+  device:
+    cuda_device: 0
+    use_cuda: true
+  imbalance:
+    focal_gamma: 2.0
+    monitor_metric: balanced_acc
+    use_class_weights: false
+    use_focal_loss: false
+    use_oversampling: false
+  model:
+    dropout: 0.2
+    gnn_type: GCN
+    hidden_channels: 32
+    num_layers: 2
+    pooling: mean
+  output:
+    confusion_matrix_plot: confusion_matrix_{contrast_type}.png
+    model_filename: brain_gnn_{contrast_type}_diagnostic.pt
+    save_model: true
+    training_history_plot: training_history_{contrast_type}.png
+    verbose: true
+  training:
+    batch_size: 128
+    epochs: 500
+    learning_rate: 0.01
+    patience: 100
+    random_seed: 42
+    test_size: 0.2
+    val_size: 0.2
+    weight_decay: 0.0
+confusion_matrix:
+- - 509
+  - 0
+- - 62
+  - 0
+results:
+  test_accuracy: 0.8914185639229422
+  test_auc: 0.5093161797325559
+  test_balanced_accuracy: 0.5
+  test_f1: 0.0
+  test_loss: 0.34334027302661835
+run_info:
+  run_dir: /home/rif17002/honors_thesis/runs/2026-02-05_16-13-50
+  run_name: 2026-02-05_16-13-50
+  timestamp: 1770326030.8145776

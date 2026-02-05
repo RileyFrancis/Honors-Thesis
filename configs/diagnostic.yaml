@@ -1,0 +1,50 @@
+# GNN Training Configuration - Diagnostic Mode
+# This tests if your data actually has predictive signal
+
+# Data Configuration
+data:
+  data_dir: '/shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data'
+  labels_csv: '/shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/subject_lists/CBCL_PLPH_m0m24_MID_n3705.csv'
+  contrast_type: 'reward'
+  threshold: 0.0
+  use_absolute: false
+
+# Model Architecture - Simple to avoid overfitting
+model:
+  gnn_type: 'GCN'
+  hidden_channels: 32  # Small model
+  num_layers: 2        # Shallow
+  dropout: 0.2         # Low dropout
+  pooling: 'mean'
+
+# Training Parameters - Let it train longer
+training:
+  batch_size: 128      # Large batches
+  learning_rate: 0.01  # High LR
+  weight_decay: 0.0    # No regularization
+  epochs: 500          # Train longer
+  patience: 100        # More patience
+  test_size: 0.2
+  val_size: 0.2
+  random_seed: 42
+
+# Class Imbalance Handling - NO correction (to see raw signal)
+imbalance:
+  use_class_weights: false  # Turn OFF to see if model can learn at all
+  use_focal_loss: false
+  focal_gamma: 2.0
+  use_oversampling: false
+  monitor_metric: 'balanced_acc'
+
+# Output Settings
+output:
+  save_model: true
+  model_filename: 'brain_gnn_{contrast_type}_diagnostic.pt'
+  training_history_plot: 'training_history_{contrast_type}.png'
+  confusion_matrix_plot: 'confusion_matrix_{contrast_type}.png'
+  verbose: true
+
+# Device Settings
+device:
+  use_cuda: true
+  cuda_device: 0

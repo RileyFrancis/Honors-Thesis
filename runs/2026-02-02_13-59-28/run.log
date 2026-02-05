@@ -1,0 +1,116 @@
+2026-02-02 13:59:28,276 - BrainGNN - INFO - ==================================================
+2026-02-02 13:59:28,279 - BrainGNN - INFO - Loading configuration from configs/config.yaml
+2026-02-02 13:59:28,286 - BrainGNN - INFO - ==================================================
+2026-02-02 13:59:28,296 - BrainGNN - INFO - Configuration loaded successfully
+2026-02-02 13:59:28,301 - BrainGNN - INFO - Using device: cuda:0
+2026-02-02 13:59:28,306 - BrainGNN - INFO - 
+==================================================
+2026-02-02 13:59:28,310 - BrainGNN - INFO - Configuration Summary
+2026-02-02 13:59:28,313 - BrainGNN - INFO - ==================================================
+2026-02-02 13:59:28,314 - BrainGNN - INFO - Run Directory: /home/rif17002/honors_thesis/runs/2026-02-02_13-59-28
+2026-02-02 13:59:28,316 - BrainGNN - INFO - Data:
+2026-02-02 13:59:28,318 - BrainGNN - INFO -   Data Directory: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data
+2026-02-02 13:59:28,321 - BrainGNN - INFO -   Labels CSV: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/subject_lists/CBCL_PLPH_m0m24_MID_n3705.csv
+2026-02-02 13:59:28,325 - BrainGNN - INFO -   Contrast Type: reward
+2026-02-02 13:59:28,326 - BrainGNN - INFO -   Edge Threshold: 0.0
+2026-02-02 13:59:28,327 - BrainGNN - INFO -   Use Absolute Values: False
+2026-02-02 13:59:28,327 - BrainGNN - INFO - 
+Model:
+2026-02-02 13:59:28,328 - BrainGNN - INFO -   GNN Type: GCN
+2026-02-02 13:59:28,330 - BrainGNN - INFO -   Hidden Channels: 64
+2026-02-02 13:59:28,331 - BrainGNN - INFO -   Num Layers: 3
+2026-02-02 13:59:28,333 - BrainGNN - INFO -   Dropout: 0.5
+2026-02-02 13:59:28,338 - BrainGNN - INFO - 
+Training:
+2026-02-02 13:59:28,345 - BrainGNN - INFO -   Batch Size: 32
+2026-02-02 13:59:28,350 - BrainGNN - INFO -   Learning Rate: 0.001
+2026-02-02 13:59:28,357 - BrainGNN - INFO -   Weight Decay: 0.0005
+2026-02-02 13:59:28,364 - BrainGNN - INFO -   Epochs: 200
+2026-02-02 13:59:28,371 - BrainGNN - INFO -   Patience: 30
+2026-02-02 13:59:28,378 - BrainGNN - INFO -   Random Seed: 42
+2026-02-02 13:59:28,384 - BrainGNN - INFO - 
+Imbalance Handling:
+2026-02-02 13:59:28,392 - BrainGNN - INFO -   Class Weights: True
+2026-02-02 13:59:28,398 - BrainGNN - INFO -   Focal Loss: True
+2026-02-02 13:59:28,405 - BrainGNN - INFO -   Focal Gamma: 2.0
+2026-02-02 13:59:28,408 - BrainGNN - INFO -   Oversampling: True
+2026-02-02 13:59:28,411 - BrainGNN - INFO -   Monitor Metric: balanced_acc
+2026-02-02 13:59:28,413 - BrainGNN - INFO - 
+==================================================
+2026-02-02 13:59:28,416 - BrainGNN - INFO - Loading reward contrast dataset...
+2026-02-02 13:59:28,417 - BrainGNN - INFO - ==================================================
+2026-02-02 13:59:28,428 - BrainGNN - INFO - Loaded 3705 subjects from labels file
+2026-02-02 13:59:33,523 - BrainGNN - INFO - Found 2853 subjects with complete data
+2026-02-02 13:59:33,531 - BrainGNN - INFO - Class distribution:
+2026-02-02 13:59:33,538 - BrainGNN - INFO -   Class 0: 2543 (89.1%)
+2026-02-02 13:59:33,542 - BrainGNN - INFO -   Class 1: 310 (10.9%)
+2026-02-02 13:59:33,550 - BrainGNN - INFO -   Imbalance ratio: 8.20:1
+2026-02-02 13:59:33,556 - BrainGNN - INFO - Dataset loaded successfully with 2853 subjects
+2026-02-02 13:59:34,590 - BrainGNN - INFO - Class weights: [0.56095165 4.601613  ]
+2026-02-02 13:59:34,600 - BrainGNN - INFO - Number of ROIs (nodes): 352
+2026-02-02 13:59:34,603 - BrainGNN - INFO - Number of node features: 6
+2026-02-02 13:59:34,604 - BrainGNN - INFO - Number of edges: 123552
+2026-02-02 13:59:34,605 - BrainGNN - INFO - Splitting dataset into train/val/test...
+2026-02-02 13:59:57,286 - BrainGNN - INFO - Dataset split:
+2026-02-02 13:59:57,290 - BrainGNN - INFO -   Train: 1825 samples
+2026-02-02 13:59:57,299 - BrainGNN - INFO -   Val:   457 samples
+2026-02-02 13:59:57,308 - BrainGNN - INFO -   Test:  571 samples
+2026-02-02 14:00:06,048 - BrainGNN - INFO -   Train class dist: Class 0: 1627, Class 1: 198 (10.8% minority)
+2026-02-02 14:00:08,114 - BrainGNN - INFO -   Val class dist: Class 0: 407, Class 1: 50 (10.9% minority)
+2026-02-02 14:00:10,717 - BrainGNN - INFO -   Test class dist: Class 0: 509, Class 1: 62 (10.9% minority)
+2026-02-02 14:00:10,721 - BrainGNN - INFO - Using oversampling for training set
+2026-02-02 14:00:34,611 - BrainGNN - INFO - 
+Initializing GCN model...
+2026-02-02 14:00:34,653 - BrainGNN - INFO - Model parameters: 11,298
+2026-02-02 14:00:34,661 - BrainGNN - INFO - 
+==================================================
+2026-02-02 14:00:34,667 - BrainGNN - INFO - Training model...
+2026-02-02 14:00:34,672 - BrainGNN - INFO - Monitoring: balanced_acc
+2026-02-02 14:00:34,675 - BrainGNN - INFO - ==================================================
+2026-02-02 14:00:34,887 - BrainGNN - INFO - Using Focal Loss with gamma=2.0
+2026-02-02 14:00:34,888 - BrainGNN - INFO - Starting training for up to 200 epochs...
+2026-02-02 14:00:34,892 - BrainGNN - ERROR - Error during training epoch: list index out of range
+Traceback (most recent call last):
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 315, in train_epoch
+    for data in loader:
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/dataloader.py", line 701, in __next__
+    data = self._next_data()
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/dataloader.py", line 757, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/_utils/fetch.py", line 52, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+IndexError: list index out of range
+2026-02-02 14:00:34,898 - BrainGNN - ERROR - Error in epoch 1: list index out of range
+Traceback (most recent call last):
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 394, in fit
+    train_loss, train_acc, train_balanced_acc = self.train_epoch(train_loader)
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 315, in train_epoch
+    for data in loader:
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/dataloader.py", line 701, in __next__
+    data = self._next_data()
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/dataloader.py", line 757, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/_utils/fetch.py", line 52, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+IndexError: list index out of range
+2026-02-02 14:00:34,900 - BrainGNN - ERROR - An error occurred during training: list index out of range
+Traceback (most recent call last):
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 804, in main
+    best_val_metric = trainer.fit(
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 394, in fit
+    train_loss, train_acc, train_balanced_acc = self.train_epoch(train_loader)
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 315, in train_epoch
+    for data in loader:
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/dataloader.py", line 701, in __next__
+    data = self._next_data()
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/dataloader.py", line 757, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/utils/data/_utils/fetch.py", line 52, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+IndexError: list index out of range

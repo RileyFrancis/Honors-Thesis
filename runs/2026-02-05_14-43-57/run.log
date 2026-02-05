@@ -1,0 +1,117 @@
+2026-02-05 14:43:57,462 - BrainGNN - INFO - ==================================================
+2026-02-05 14:43:57,464 - BrainGNN - INFO - Loading configuration from configs/config.yaml
+2026-02-05 14:43:57,470 - BrainGNN - INFO - ==================================================
+2026-02-05 14:43:57,481 - BrainGNN - INFO - Configuration loaded successfully
+2026-02-05 14:43:57,486 - BrainGNN - INFO - Using device: cuda:0
+2026-02-05 14:43:57,490 - BrainGNN - INFO - 
+==================================================
+2026-02-05 14:43:57,493 - BrainGNN - INFO - Configuration Summary
+2026-02-05 14:43:57,494 - BrainGNN - INFO - ==================================================
+2026-02-05 14:43:57,496 - BrainGNN - INFO - Run Directory: /home/rif17002/honors_thesis/runs/2026-02-05_14-43-57
+2026-02-05 14:43:57,497 - BrainGNN - INFO - Data:
+2026-02-05 14:43:57,498 - BrainGNN - INFO -   Data Directory: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data
+2026-02-05 14:43:57,499 - BrainGNN - INFO -   Labels CSV: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/subject_lists/CBCL_PLPH_m0m24_MID_n3705.csv
+2026-02-05 14:43:57,500 - BrainGNN - INFO -   Contrast Type: reward
+2026-02-05 14:43:57,501 - BrainGNN - INFO -   Edge Threshold: 0.0
+2026-02-05 14:43:57,502 - BrainGNN - INFO -   Use Absolute Values: False
+2026-02-05 14:43:57,503 - BrainGNN - INFO - 
+Model:
+2026-02-05 14:43:57,506 - BrainGNN - INFO -   GNN Type: GCN
+2026-02-05 14:43:57,513 - BrainGNN - INFO -   Hidden Channels: 128
+2026-02-05 14:43:57,524 - BrainGNN - INFO -   Num Layers: 3
+2026-02-05 14:43:57,530 - BrainGNN - INFO -   Dropout: 0.5
+2026-02-05 14:43:57,539 - BrainGNN - INFO - 
+Training:
+2026-02-05 14:43:57,544 - BrainGNN - INFO -   Batch Size: 32
+2026-02-05 14:43:57,551 - BrainGNN - INFO -   Learning Rate: 0.001
+2026-02-05 14:43:57,555 - BrainGNN - INFO -   Weight Decay: 0.0005
+2026-02-05 14:43:57,562 - BrainGNN - INFO -   Epochs: 200
+2026-02-05 14:43:57,567 - BrainGNN - INFO -   Patience: 30
+2026-02-05 14:43:57,574 - BrainGNN - INFO -   Random Seed: 42
+2026-02-05 14:43:57,581 - BrainGNN - INFO - 
+Imbalance Handling:
+2026-02-05 14:43:57,586 - BrainGNN - INFO -   Class Weights: True
+2026-02-05 14:43:57,589 - BrainGNN - INFO -   Focal Loss: False
+2026-02-05 14:43:57,591 - BrainGNN - INFO -   Oversampling: False
+2026-02-05 14:43:57,594 - BrainGNN - INFO -   Monitor Metric: balanced_acc
+2026-02-05 14:43:57,600 - BrainGNN - INFO - 
+==================================================
+2026-02-05 14:43:57,602 - BrainGNN - INFO - Loading reward contrast dataset...
+2026-02-05 14:43:57,605 - BrainGNN - INFO - ==================================================
+2026-02-05 14:43:57,660 - BrainGNN - INFO - Loaded 3705 subjects from labels file
+2026-02-05 14:44:04,783 - BrainGNN - INFO - Found 2853 subjects with complete data
+2026-02-05 14:44:04,789 - BrainGNN - INFO - Class distribution:
+2026-02-05 14:44:04,793 - BrainGNN - INFO -   Class 0: 2543 (89.1%)
+2026-02-05 14:44:04,795 - BrainGNN - INFO -   Class 1: 310 (10.9%)
+2026-02-05 14:44:04,799 - BrainGNN - INFO -   Imbalance ratio: 8.20:1
+2026-02-05 14:44:04,800 - BrainGNN - INFO - Dataset loaded successfully with 2853 subjects
+2026-02-05 14:44:05,880 - BrainGNN - INFO - Class weights: [0.56095165 4.601613  ]
+2026-02-05 14:44:05,901 - BrainGNN - INFO - Number of ROIs (nodes): 352
+2026-02-05 14:44:05,904 - BrainGNN - INFO - Number of node features: 6
+2026-02-05 14:44:05,906 - BrainGNN - INFO - Number of edges: 123552
+2026-02-05 14:44:05,908 - BrainGNN - INFO - Splitting dataset into train/val/test...
+2026-02-05 14:44:36,302 - BrainGNN - INFO - Dataset split:
+2026-02-05 14:44:36,303 - BrainGNN - INFO -   Train: 1825 samples
+2026-02-05 14:44:36,305 - BrainGNN - INFO -   Val:   457 samples
+2026-02-05 14:44:36,310 - BrainGNN - INFO -   Test:  571 samples
+2026-02-05 14:44:46,284 - BrainGNN - INFO -   Train class dist: Class 0: 1627, Class 1: 198 (10.8% minority)
+2026-02-05 14:44:48,650 - BrainGNN - INFO -   Val class dist: Class 0: 407, Class 1: 50 (10.9% minority)
+2026-02-05 14:44:51,671 - BrainGNN - INFO -   Test class dist: Class 0: 509, Class 1: 62 (10.9% minority)
+2026-02-05 14:45:09,163 - BrainGNN - INFO - 
+Initializing GCN model...
+2026-02-05 14:45:09,223 - BrainGNN - INFO - Model parameters: 43,074
+2026-02-05 14:45:09,225 - BrainGNN - INFO - 
+==================================================
+2026-02-05 14:45:09,230 - BrainGNN - INFO - Training model...
+2026-02-05 14:45:09,233 - BrainGNN - INFO - Monitoring: balanced_acc
+2026-02-05 14:45:09,235 - BrainGNN - INFO - ==================================================
+2026-02-05 14:45:09,490 - BrainGNN - INFO - Using weighted CrossEntropy with weights: [0.56095165 4.601613  ]
+2026-02-05 14:45:09,494 - BrainGNN - INFO - Starting training for up to 200 epochs...
+2026-02-05 14:45:16,236 - BrainGNN - INFO - Epoch 1: New best balanced_acc: 0.5102
+2026-02-05 14:45:22,698 - BrainGNN - INFO - Epoch 2: New best balanced_acc: 0.5114
+2026-02-05 14:46:14,010 - BrainGNN - INFO - Epoch 010: Train Loss: 0.6937, Train Acc: 0.8751, Train Balanced Acc: 0.4997 | Val Loss: 0.7178, Val Acc: 0.8906, Val Balanced Acc: 0.5000, Val F1: 0.0000, Val AUC: 0.4755
+2026-02-05 14:47:17,739 - BrainGNN - INFO - Epoch 020: Train Loss: 0.6923, Train Acc: 0.8910, Train Balanced Acc: 0.4997 | Val Loss: 0.7136, Val Acc: 0.8906, Val Balanced Acc: 0.5000, Val F1: 0.0000, Val AUC: 0.4896
+2026-02-05 14:48:21,593 - BrainGNN - INFO - Epoch 030: Train Loss: 0.6895, Train Acc: 0.8636, Train Balanced Acc: 0.4954 | Val Loss: 0.7611, Val Acc: 0.8906, Val Balanced Acc: 0.5000, Val F1: 0.0000, Val AUC: 0.4254
+2026-02-05 14:48:34,427 - BrainGNN - INFO - Early stopping at epoch 32
+2026-02-05 14:48:34,429 - BrainGNN - INFO - Training completed. Best balanced_acc: 0.5114
+2026-02-05 14:48:34,429 - BrainGNN - INFO - Best validation balanced_acc: 0.5114
+2026-02-05 14:48:34,430 - BrainGNN - INFO - 
+==================================================
+2026-02-05 14:48:34,433 - BrainGNN - INFO - Evaluating on test set...
+2026-02-05 14:48:34,440 - BrainGNN - INFO - ==================================================
+2026-02-05 14:48:35,578 - BrainGNN - INFO - 
+Test Results:
+2026-02-05 14:48:35,582 - BrainGNN - INFO -   Loss:              0.6912
+2026-02-05 14:48:35,588 - BrainGNN - INFO -   Accuracy:          0.8914
+2026-02-05 14:48:35,591 - BrainGNN - INFO -   Balanced Accuracy: 0.5000
+2026-02-05 14:48:35,594 - BrainGNN - INFO -   F1 Score:          0.0000
+2026-02-05 14:48:35,598 - BrainGNN - INFO -   AUC:               0.4772
+2026-02-05 14:48:35,600 - BrainGNN - INFO - 
+Classification Report:
+2026-02-05 14:48:35,607 - BrainGNN - INFO - 
+              precision    recall  f1-score   support
+
+     Class 0       0.89      1.00      0.94       509
+     Class 1       0.00      0.00      0.00        62
+
+    accuracy                           0.89       571
+   macro avg       0.45      0.50      0.47       571
+weighted avg       0.79      0.89      0.84       571
+
+2026-02-05 14:48:35,609 - BrainGNN - INFO - 
+Per-class metrics:
+2026-02-05 14:48:35,611 - BrainGNN - INFO -   Class 0 - Precision: 0.8914, Recall: 1.0000
+2026-02-05 14:48:35,611 - BrainGNN - INFO -   Class 1 - Precision: nan, Recall: 0.0000
+2026-02-05 14:48:35,614 - BrainGNN - INFO - 
+Saving training visualizations...
+2026-02-05 14:48:36,392 - BrainGNN - INFO - Saved training history to /home/rif17002/honors_thesis/runs/2026-02-05_14-43-57/training_history_reward.png
+2026-02-05 14:48:36,812 - BrainGNN - INFO - Saved confusion matrix to /home/rif17002/honors_thesis/runs/2026-02-05_14-43-57/confusion_matrix_reward.png
+2026-02-05 14:48:36,816 - BrainGNN - INFO - Saving model to /home/rif17002/honors_thesis/runs/2026-02-05_14-43-57/brain_gnn_reward_balanced.pt
+2026-02-05 14:48:36,900 - BrainGNN - INFO - Model saved successfully
+2026-02-05 14:48:36,902 - BrainGNN - INFO - Saving results summary to /home/rif17002/honors_thesis/runs/2026-02-05_14-43-57/results_reward.yaml
+2026-02-05 14:48:36,923 - BrainGNN - INFO - Results summary saved successfully
+2026-02-05 14:48:36,927 - BrainGNN - INFO - 
+==================================================
+2026-02-05 14:48:36,932 - BrainGNN - INFO - Training completed successfully!
+2026-02-05 14:48:36,939 - BrainGNN - INFO - All outputs saved to: /home/rif17002/honors_thesis/runs/2026-02-05_14-43-57
+2026-02-05 14:48:36,942 - BrainGNN - INFO - ==================================================
