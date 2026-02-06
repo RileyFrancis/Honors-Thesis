@@ -1,0 +1,53 @@
+2026-02-05 17:58:26,331 - BrainGNN - INFO - ==================================================
+2026-02-05 17:58:26,332 - BrainGNN - INFO - Loading configuration from configs/config.yaml
+2026-02-05 17:58:26,332 - BrainGNN - INFO - ==================================================
+2026-02-05 17:58:26,336 - BrainGNN - INFO - Configuration loaded successfully
+2026-02-05 17:58:26,336 - BrainGNN - INFO - Using device: cuda:0
+2026-02-05 17:58:26,337 - BrainGNN - INFO - 
+==================================================
+2026-02-05 17:58:26,337 - BrainGNN - INFO - Configuration Summary
+2026-02-05 17:58:26,337 - BrainGNN - INFO - ==================================================
+2026-02-05 17:58:26,337 - BrainGNN - INFO - Run Directory: /home/rif17002/honors_thesis/runs/2026-02-05_17-58-26
+2026-02-05 17:58:26,337 - BrainGNN - INFO - Data:
+2026-02-05 17:58:26,338 - BrainGNN - INFO -   Data Directory: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data
+2026-02-05 17:58:26,338 - BrainGNN - INFO -   Labels CSV: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/subject_lists/CBCL_PLPH_m0m24_MID_n3705.csv
+2026-02-05 17:58:26,338 - BrainGNN - INFO -   Contrast Type: reward
+2026-02-05 17:58:26,338 - BrainGNN - INFO -   Edge Threshold: 0.1
+2026-02-05 17:58:26,338 - BrainGNN - INFO -   Use Absolute Values: True
+2026-02-05 17:58:26,338 - BrainGNN - INFO - 
+Model:
+2026-02-05 17:58:26,339 - BrainGNN - INFO -   GNN Type: GCN
+2026-02-05 17:58:26,339 - BrainGNN - INFO -   Hidden Channels: 64
+2026-02-05 17:58:26,339 - BrainGNN - INFO -   Num Layers: 3
+2026-02-05 17:58:26,339 - BrainGNN - INFO -   Dropout: 0.4
+2026-02-05 17:58:26,339 - BrainGNN - INFO - 
+Training:
+2026-02-05 17:58:26,339 - BrainGNN - INFO -   Batch Size: 32
+2026-02-05 17:58:26,340 - BrainGNN - INFO -   Learning Rate: 0.001
+2026-02-05 17:58:26,340 - BrainGNN - INFO -   Weight Decay: 0.0005
+2026-02-05 17:58:26,340 - BrainGNN - INFO -   Epochs: 200
+2026-02-05 17:58:26,340 - BrainGNN - INFO -   Patience: 50
+2026-02-05 17:58:26,340 - BrainGNN - INFO -   Random Seed: 0
+2026-02-05 17:58:26,340 - BrainGNN - INFO - 
+Imbalance Handling:
+2026-02-05 17:58:26,341 - BrainGNN - INFO -   Class Weights: True
+2026-02-05 17:58:26,341 - BrainGNN - INFO -   Focal Loss: True
+2026-02-05 17:58:26,341 - BrainGNN - INFO -   Focal Gamma: 2.0
+2026-02-05 17:58:26,341 - BrainGNN - INFO -   Oversampling: False
+2026-02-05 17:58:26,341 - BrainGNN - INFO -   Monitor Metric: f1
+2026-02-05 17:58:26,341 - BrainGNN - INFO - 
+==================================================
+2026-02-05 17:58:26,342 - BrainGNN - INFO - Loading reward contrast dataset...
+2026-02-05 17:58:26,342 - BrainGNN - INFO - ==================================================
+2026-02-05 17:58:26,347 - BrainGNN - INFO - Loaded 3705 subjects from labels file
+2026-02-05 17:58:27,596 - BrainGNN - INFO - Found 2853 subjects with complete data
+2026-02-05 17:58:27,599 - BrainGNN - INFO - Class distribution:
+2026-02-05 17:58:27,599 - BrainGNN - INFO -   Class 0: 2543 (89.1%)
+2026-02-05 17:58:27,599 - BrainGNN - INFO -   Class 1: 310 (10.9%)
+2026-02-05 17:58:27,600 - BrainGNN - INFO -   Imbalance ratio: 8.20:1
+2026-02-05 17:58:27,600 - BrainGNN - INFO - Dataset loaded successfully with 2853 subjects
+2026-02-05 17:58:28,648 - BrainGNN - INFO - Class weights: [0.56095165 4.601613  ]
+2026-02-05 17:58:28,669 - BrainGNN - INFO - Number of ROIs (nodes): 352
+2026-02-05 17:58:28,674 - BrainGNN - INFO - Number of node features: 6
+2026-02-05 17:58:28,675 - BrainGNN - INFO - Number of edges: 75154
+2026-02-05 17:58:28,675 - BrainGNN - INFO - Splitting dataset into train/val/test...

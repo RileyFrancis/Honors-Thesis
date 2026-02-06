@@ -1,0 +1,85 @@
+2026-02-05 17:32:11,294 - BrainGNN - INFO - ==================================================
+2026-02-05 17:32:11,294 - BrainGNN - INFO - Loading configuration from configs/config.yaml
+2026-02-05 17:32:11,294 - BrainGNN - INFO - ==================================================
+2026-02-05 17:32:11,298 - BrainGNN - INFO - Configuration loaded successfully
+2026-02-05 17:32:11,298 - BrainGNN - INFO - Using device: cuda:0
+2026-02-05 17:32:11,299 - BrainGNN - INFO - 
+==================================================
+2026-02-05 17:32:11,299 - BrainGNN - INFO - Configuration Summary
+2026-02-05 17:32:11,299 - BrainGNN - INFO - ==================================================
+2026-02-05 17:32:11,299 - BrainGNN - INFO - Run Directory: /home/rif17002/honors_thesis/runs/2026-02-05_17-32-11
+2026-02-05 17:32:11,299 - BrainGNN - INFO - Data:
+2026-02-05 17:32:11,299 - BrainGNN - INFO -   Data Directory: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data
+2026-02-05 17:32:11,300 - BrainGNN - INFO -   Labels CSV: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/subject_lists/CBCL_PLPH_m0m24_MID_n3705.csv
+2026-02-05 17:32:11,300 - BrainGNN - INFO -   Contrast Type: reward
+2026-02-05 17:32:11,300 - BrainGNN - INFO -   Edge Threshold: 0.1
+2026-02-05 17:32:11,300 - BrainGNN - INFO -   Use Absolute Values: False
+2026-02-05 17:32:11,300 - BrainGNN - INFO - 
+Model:
+2026-02-05 17:32:11,300 - BrainGNN - INFO -   GNN Type: GCN
+2026-02-05 17:32:11,301 - BrainGNN - INFO -   Hidden Channels: 64
+2026-02-05 17:32:11,301 - BrainGNN - INFO -   Num Layers: 3
+2026-02-05 17:32:11,301 - BrainGNN - INFO -   Dropout: 0.4
+2026-02-05 17:32:11,301 - BrainGNN - INFO - 
+Training:
+2026-02-05 17:32:11,301 - BrainGNN - INFO -   Batch Size: 32
+2026-02-05 17:32:11,302 - BrainGNN - INFO -   Learning Rate: 0.001
+2026-02-05 17:32:11,302 - BrainGNN - INFO -   Weight Decay: 0.0005
+2026-02-05 17:32:11,302 - BrainGNN - INFO -   Epochs: 200
+2026-02-05 17:32:11,302 - BrainGNN - INFO -   Patience: 50
+2026-02-05 17:32:11,302 - BrainGNN - INFO -   Random Seed: 0
+2026-02-05 17:32:11,303 - BrainGNN - INFO - 
+Imbalance Handling:
+2026-02-05 17:32:11,303 - BrainGNN - INFO -   Class Weights: True
+2026-02-05 17:32:11,303 - BrainGNN - INFO -   Focal Loss: True
+2026-02-05 17:32:11,303 - BrainGNN - INFO -   Focal Gamma: 2.0
+2026-02-05 17:32:11,303 - BrainGNN - INFO -   Oversampling: False
+2026-02-05 17:32:11,303 - BrainGNN - INFO -   Monitor Metric: f1
+2026-02-05 17:32:11,304 - BrainGNN - INFO - 
+==================================================
+2026-02-05 17:32:11,304 - BrainGNN - INFO - Loading reward contrast dataset...
+2026-02-05 17:32:11,304 - BrainGNN - INFO - ==================================================
+2026-02-05 17:32:11,309 - BrainGNN - INFO - Loaded 3705 subjects from labels file
+2026-02-05 17:32:12,742 - BrainGNN - INFO - Found 2853 subjects with complete data
+2026-02-05 17:32:12,745 - BrainGNN - INFO - Class distribution:
+2026-02-05 17:32:12,745 - BrainGNN - INFO -   Class 0: 2543 (89.1%)
+2026-02-05 17:32:12,746 - BrainGNN - INFO -   Class 1: 310 (10.9%)
+2026-02-05 17:32:12,746 - BrainGNN - INFO -   Imbalance ratio: 8.20:1
+2026-02-05 17:32:12,746 - BrainGNN - INFO - Dataset loaded successfully with 2853 subjects
+2026-02-05 17:32:13,795 - BrainGNN - INFO - Class weights: [0.56095165 4.601613  ]
+2026-02-05 17:32:13,821 - BrainGNN - INFO - Number of ROIs (nodes): 352
+2026-02-05 17:32:13,827 - BrainGNN - INFO - Number of node features: 6
+2026-02-05 17:32:13,827 - BrainGNN - INFO - Number of edges: 75154
+2026-02-05 17:32:13,828 - BrainGNN - INFO - Splitting dataset into train/val/test...
+2026-02-05 17:32:47,250 - BrainGNN - INFO - Dataset split:
+2026-02-05 17:32:47,251 - BrainGNN - INFO -   Train: 1825 samples
+2026-02-05 17:32:47,251 - BrainGNN - INFO -   Val:   457 samples
+2026-02-05 17:32:47,251 - BrainGNN - INFO -   Test:  571 samples
+2026-02-05 17:32:54,649 - BrainGNN - INFO -   Train class dist: Class 0: 1627, Class 1: 198 (10.8% minority)
+2026-02-05 17:32:56,498 - BrainGNN - INFO -   Val class dist: Class 0: 407, Class 1: 50 (10.9% minority)
+2026-02-05 17:32:58,859 - BrainGNN - INFO -   Test class dist: Class 0: 509, Class 1: 62 (10.9% minority)
+2026-02-05 17:33:12,400 - BrainGNN - INFO - 
+Initializing GCN model...
+2026-02-05 17:33:12,441 - BrainGNN - INFO - Model parameters: 11,298
+2026-02-05 17:33:12,441 - BrainGNN - INFO - 
+==================================================
+2026-02-05 17:33:12,441 - BrainGNN - INFO - Training model...
+2026-02-05 17:33:12,442 - BrainGNN - INFO - Monitoring: f1
+2026-02-05 17:33:12,442 - BrainGNN - INFO - ==================================================
+2026-02-05 17:33:12,649 - BrainGNN - INFO - Using Focal Loss with gamma=2.0
+2026-02-05 17:33:12,650 - BrainGNN - INFO - Starting training for up to 200 epochs...
+2026-02-05 17:33:44,297 - BrainGNN - INFO - Epoch 010: Train Loss: nan, Train Acc: 0.8915, Train Balanced Acc: 0.5000 | Val Loss: nan, Val Acc: 0.8906, Val Balanced Acc: 0.5000, Val F1: 0.0000, Val AUC: 0.0000
+2026-02-05 17:34:15,301 - BrainGNN - INFO - Epoch 020: Train Loss: nan, Train Acc: 0.8915, Train Balanced Acc: 0.5000 | Val Loss: nan, Val Acc: 0.8906, Val Balanced Acc: 0.5000, Val F1: 0.0000, Val AUC: 0.0000
+2026-02-05 17:34:46,519 - BrainGNN - INFO - Epoch 030: Train Loss: nan, Train Acc: 0.8915, Train Balanced Acc: 0.5000 | Val Loss: nan, Val Acc: 0.8906, Val Balanced Acc: 0.5000, Val F1: 0.0000, Val AUC: 0.0000
+2026-02-05 17:35:17,910 - BrainGNN - INFO - Epoch 040: Train Loss: nan, Train Acc: 0.8915, Train Balanced Acc: 0.5000 | Val Loss: nan, Val Acc: 0.8906, Val Balanced Acc: 0.5000, Val F1: 0.0000, Val AUC: 0.0000
+2026-02-05 17:35:48,602 - BrainGNN - INFO - Epoch 050: Train Loss: nan, Train Acc: 0.8915, Train Balanced Acc: 0.5000 | Val Loss: nan, Val Acc: 0.8906, Val Balanced Acc: 0.5000, Val F1: 0.0000, Val AUC: 0.0000
+2026-02-05 17:35:48,602 - BrainGNN - INFO - Early stopping at epoch 50
+2026-02-05 17:35:48,603 - BrainGNN - ERROR - An error occurred during training: Expected state_dict to be dict-like, got <class 'NoneType'>.
+Traceback (most recent call last):
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 812, in main
+    best_val_metric = trainer.fit(
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 445, in fit
+    self.model.load_state_dict(best_model_state)
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2516, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'NoneType'>.

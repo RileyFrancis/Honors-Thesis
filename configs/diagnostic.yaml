@@ -19,7 +19,7 @@ model:
 
 # Training Parameters - Let it train longer
 training:
-  batch_size: 128      # Large batches
+  batch_size: 64      # Large batches
   learning_rate: 0.01  # High LR
   weight_decay: 0.0    # No regularization
   epochs: 500          # Train longer

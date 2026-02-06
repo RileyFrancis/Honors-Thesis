@@ -6,8 +6,8 @@ data:
   data_dir: '/shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data'
   labels_csv: '/shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/subject_lists/CBCL_PLPH_m0m24_MID_n3705.csv'
   contrast_type: 'reward'  # 'reward' or 'loss'
-  threshold: 0.0  # Edge threshold (edges with |weight| < threshold are removed)
-  use_absolute: false  # Use absolute values of correlations
+  threshold: 0.1  # Edge threshold (edges with |weight| < threshold are removed)
+  use_absolute: true  # Use absolute values of correlations
 
 # Model Architecture
 model:
@@ -32,9 +32,9 @@ training:
 imbalance:
   use_class_weights: true  # Weight loss by inverse class frequency
   use_focal_loss: true    # Use Focal Loss instead of CrossEntropy
-  focal_gamma: 1.5        # Focal loss focusing parameter (1.5-3.0)
+  focal_gamma: 2.0        # Focal loss focusing parameter (1.5-3.0)
   use_oversampling: false  # Oversample minority class in training
-  monitor_metric: 'f1'  # 'balanced_acc', 'f1', 'auc', or 'acc'
+  monitor_metric: 'balanced_acc'  # 'balanced_acc', 'f1', 'auc', or 'acc'
 
 # Output Settings
 output:
