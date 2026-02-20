@@ -1,0 +1,74 @@
+2026-02-06 10:49:43,475 - BrainGNN - INFO - ==================================================
+2026-02-06 10:49:43,480 - BrainGNN - INFO - Loading configuration from configs/diversity.yaml
+2026-02-06 10:49:43,488 - BrainGNN - INFO - ==================================================
+2026-02-06 10:49:43,503 - BrainGNN - INFO - Configuration loaded successfully
+2026-02-06 10:49:43,508 - BrainGNN - INFO - Using device: cuda:0
+2026-02-06 10:49:43,514 - BrainGNN - INFO - 
+==================================================
+2026-02-06 10:49:43,523 - BrainGNN - INFO - Configuration Summary
+2026-02-06 10:49:43,535 - BrainGNN - INFO - ==================================================
+2026-02-06 10:49:43,542 - BrainGNN - INFO - Run Directory: /home/rif17002/honors_thesis/runs/2026-02-06_10-49-43
+2026-02-06 10:49:43,549 - BrainGNN - INFO - Data:
+2026-02-06 10:49:43,556 - BrainGNN - INFO -   Data Directory: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data
+2026-02-06 10:49:43,560 - BrainGNN - INFO -   Labels CSV: /shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/subject_lists/CBCL_PLPH_m0m24_MID_n3705.csv
+2026-02-06 10:49:43,564 - BrainGNN - INFO -   Contrast Type: reward
+2026-02-06 10:49:43,567 - BrainGNN - INFO -   Edge Threshold: 0.0
+2026-02-06 10:49:43,568 - BrainGNN - INFO -   Use Absolute Values: False
+2026-02-06 10:49:43,570 - BrainGNN - INFO - 
+Model:
+2026-02-06 10:49:43,570 - BrainGNN - INFO -   GNN Type: GCN
+2026-02-06 10:49:43,571 - BrainGNN - INFO -   Hidden Channels: 128
+2026-02-06 10:49:43,572 - BrainGNN - INFO -   Num Layers: 3
+2026-02-06 10:49:43,572 - BrainGNN - INFO -   Dropout: 0.4
+2026-02-06 10:49:43,575 - BrainGNN - INFO - 
+Training:
+2026-02-06 10:49:43,575 - BrainGNN - INFO -   Batch Size: 64
+2026-02-06 10:49:43,576 - BrainGNN - INFO -   Learning Rate: 0.002
+2026-02-06 10:49:43,576 - BrainGNN - INFO -   Weight Decay: 0.0001
+2026-02-06 10:49:43,577 - BrainGNN - INFO -   Epochs: 300
+2026-02-06 10:49:43,577 - BrainGNN - INFO -   Patience: 40
+2026-02-06 10:49:43,577 - BrainGNN - INFO -   Random Seed: 42
+2026-02-06 10:49:43,577 - BrainGNN - INFO - 
+Imbalance Handling:
+2026-02-06 10:49:43,578 - BrainGNN - INFO -   Class Weights: True
+2026-02-06 10:49:43,578 - BrainGNN - INFO -   Focal Loss: False
+2026-02-06 10:49:43,578 - BrainGNN - INFO -   Oversampling: False
+2026-02-06 10:49:43,579 - BrainGNN - INFO -   Monitor Metric: balanced_acc
+2026-02-06 10:49:43,579 - BrainGNN - INFO - 
+==================================================
+2026-02-06 10:49:43,580 - BrainGNN - INFO - Loading reward contrast dataset...
+2026-02-06 10:49:43,580 - BrainGNN - INFO - ==================================================
+2026-02-06 10:49:43,586 - BrainGNN - INFO - Loaded 3705 subjects from labels file
+2026-02-06 10:49:48,669 - BrainGNN - INFO - Found 2853 subjects with complete data
+2026-02-06 10:49:48,674 - BrainGNN - INFO - Class distribution:
+2026-02-06 10:49:48,677 - BrainGNN - INFO -   Class 0: 2543 (89.1%)
+2026-02-06 10:49:48,678 - BrainGNN - INFO -   Class 1: 310 (10.9%)
+2026-02-06 10:49:48,679 - BrainGNN - INFO -   Imbalance ratio: 8.20:1
+2026-02-06 10:49:48,679 - BrainGNN - INFO - Dataset loaded successfully with 2853 subjects
+2026-02-06 10:49:49,565 - BrainGNN - INFO - Class weights: [0.56095165 4.601613  ]
+2026-02-06 10:49:49,577 - BrainGNN - ERROR - Error loading data for subject NDARINV003RTV85: axis 1 is out of bounds for array of dimension 1
+Traceback (most recent call last):
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 117, in get
+    node_features = self._compute_node_features(contrast_matrix)
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 171, in _compute_node_features
+    features.append(np.sum(matrix[matrix > 0], axis=1) if np.any(matrix > 0) else np.zeros(matrix.shape[0]))  # Positive strength
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/numpy/_core/fromnumeric.py", line 2466, in sum
+    return _wrapreduction(
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/numpy/_core/fromnumeric.py", line 86, in _wrapreduction
+    return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+numpy.exceptions.AxisError: axis 1 is out of bounds for array of dimension 1
+2026-02-06 10:49:49,581 - BrainGNN - ERROR - An error occurred during training: axis 1 is out of bounds for array of dimension 1
+Traceback (most recent call last):
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 795, in main
+    sample = dataset[0]
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/torch_geometric/data/dataset.py", line 294, in __getitem__
+    data = self.get(self.indices()[idx])
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 117, in get
+    node_features = self._compute_node_features(contrast_matrix)
+  File "/home/rif17002/honors_thesis/train_brain_gnn.py", line 171, in _compute_node_features
+    features.append(np.sum(matrix[matrix > 0], axis=1) if np.any(matrix > 0) else np.zeros(matrix.shape[0]))  # Positive strength
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/numpy/_core/fromnumeric.py", line 2466, in sum
+    return _wrapreduction(
+  File "/home/rif17002/anaconda3/envs/honors/lib/python3.10/site-packages/numpy/_core/fromnumeric.py", line 86, in _wrapreduction
+    return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+numpy.exceptions.AxisError: axis 1 is out of bounds for array of dimension 1

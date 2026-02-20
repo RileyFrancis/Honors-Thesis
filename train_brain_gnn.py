@@ -25,8 +25,11 @@ import seaborn as sns
 from tqdm import tqdm
 import yaml
 import argparse
+from scipy import stats
 import warnings
 warnings.filterwarnings('ignore')
+
+from enhanced_dataset import EnhancedBrainConnectivityDataset
 
 
 class BrainConnectivityDataset(Dataset):
@@ -148,25 +151,62 @@ class BrainConnectivityDataset(Dataset):
         return edge_index, edge_attr
     
     def _compute_node_features(self, matrix):
-        """Compute node features from connectivity matrix"""
-        # Multiple features per node
+        """Compute comprehensive node features from connectivity matrix"""
         features = []
         
-        # Mean connectivity
+        # Basic statistics (original 6 features)
         features.append(np.mean(matrix, axis=1))
-        
-        # Std of connectivity
         features.append(np.std(matrix, axis=1))
-        
-        # Max connectivity
         features.append(np.max(matrix, axis=1))
-        
-        # Min connectivity
         features.append(np.min(matrix, axis=1))
-        
-        # Positive and negative connectivity
         features.append(np.sum(matrix > 0, axis=1))
         features.append(np.sum(matrix < 0, axis=1))
+        
+        # Extended statistics (8 new features)
+        features.append(np.median(matrix, axis=1))
+        features.append(np.percentile(matrix, 25, axis=1))
+        features.append(np.percentile(matrix, 75, axis=1))
+        features.append(np.var(matrix, axis=1))
+        
+        # Strength features (4 new features)
+        pos_mask = matrix > 0
+        neg_mask = matrix < 0
+
+        pos_strength = np.sum(matrix * pos_mask, axis=1)
+        neg_strength = np.sum(np.abs(matrix) * neg_mask, axis=1)
+
+        features.append(np.sum(np.abs(matrix), axis=1))  # Total absolute strength
+        features.append(pos_strength)                    # Positive strength (per node)
+        features.append(neg_strength)                    # Negative strength magnitude (per node)
+        features.append(np.sum(matrix, axis=1))          # Net strength
+
+        
+        # Ratio features (3 new features)
+        pos_count = np.sum(matrix > 0, axis=1)
+        neg_count = np.sum(matrix < 0, axis=1)
+        total_count = pos_count + neg_count
+        features.append(np.divide(pos_count, total_count, where=total_count!=0, out=np.zeros_like(pos_count, dtype=float)))  # Ratio positive
+        
+        pos_strength = np.sum(matrix[matrix > 0], axis=1) if np.any(matrix > 0) else np.zeros(matrix.shape[0])
+        neg_strength = np.sum(np.abs(matrix[matrix < 0]), axis=1) if np.any(matrix < 0) else np.zeros(matrix.shape[0])
+        total_strength = pos_strength + neg_strength
+        features.append(np.divide(pos_strength, total_strength, where=total_strength!=0, out=np.zeros_like(pos_strength)))  # Ratio positive strength
+        
+        # Outlier features (2 new features)
+        z_scores = np.abs((matrix - np.mean(matrix, axis=1, keepdims=True)) / (np.std(matrix, axis=1, keepdims=True) + 1e-8))
+        features.append(np.sum(z_scores > 2, axis=1))  # Count of outliers (|z| > 2)
+        features.append(np.max(z_scores, axis=1))  # Maximum z-score
+        
+        # Skewness and kurtosis (2 new features)
+        from scipy import stats
+        features.append(np.array([stats.skew(row) for row in matrix]))
+        features.append(np.array([stats.kurtosis(row) for row in matrix]))
+        
+        # Range features (2 new features)
+        features.append(np.ptp(matrix, axis=1))  # Peak-to-peak (range)
+        features.append(np.max(matrix, axis=1) - np.median(matrix, axis=1))  # Max - median
+        
+        # Total: 6 (original) + 8 + 4 + 3 + 2 + 2 + 2 = 27 features per node
         
         return np.column_stack(features)
     
@@ -274,10 +314,12 @@ class GNNTrainer:
     Trainer class for GNN models with class imbalance handling
     """
     def __init__(self, model, device='cuda', learning_rate=0.001, weight_decay=5e-4,
-                 class_weights=None, use_focal_loss=False, focal_gamma=2.0, logger=None):
+                 class_weights=None, use_focal_loss=False, focal_gamma=2.0, logger=None,
+                 diversity_weight=0.1):
         self.model = model.to(device)
         self.device = device
         self.logger = logger or logging.getLogger(__name__)
+        self.diversity_weight = diversity_weight
         self.optimizer = torch.optim.Adam(
             model.parameters(), 
             lr=learning_rate, 
@@ -296,6 +338,9 @@ class GNNTrainer:
                 class_weights = class_weights.to(device)
             self.criterion = nn.CrossEntropyLoss(weight=class_weights)
         
+        if diversity_weight > 0:
+            self.logger.info(f"Using diversity penalty with weight: {diversity_weight}")
+        
         # Track training history
         self.train_losses = []
         self.train_accs = []
@@ -303,6 +348,30 @@ class GNNTrainer:
         self.val_losses = []
         self.val_accs = []
         self.val_balanced_accs = []
+    
+    def compute_diversity_penalty(self, predictions):
+        """
+        Compute penalty for predicting the same class for everything.
+        Encourages the model to use both classes.
+        """
+        # Get predicted probabilities
+        probs = F.softmax(predictions, dim=1)
+        
+        # Compute mean probability for each class across the batch
+        mean_probs = probs.mean(dim=0)
+        
+        # Penalty is high when predictions are all one class
+        # Target is uniform distribution [0.5, 0.5]
+        target = torch.ones_like(mean_probs) / mean_probs.shape[0]
+        
+        # KL divergence from uniform distribution
+        diversity_loss = F.kl_div(
+            mean_probs.log(),
+            target,
+            reduction='batchmean'
+        )
+        
+        return diversity_loss
     
     def train_epoch(self, loader):
         """Train for one epoch"""
@@ -317,7 +386,14 @@ class GNNTrainer:
                 self.optimizer.zero_grad()
                 
                 out = self.model(data)
+                
+                # Main classification loss
                 loss = self.criterion(out, data.y)
+                
+                # Add diversity penalty to encourage predicting both classes
+                if self.diversity_weight > 0:
+                    diversity_penalty = self.compute_diversity_penalty(out)
+                    loss = loss + self.diversity_weight * diversity_penalty
                 
                 loss.backward()
                 self.optimizer.step()
@@ -702,7 +778,16 @@ def main(config_path='configs/config.yaml'):
         logger.info(f"Loading {CONTRAST_TYPE} contrast dataset...")
         logger.info("="*50)
         
-        dataset = BrainConnectivityDataset(
+        # dataset = BrainConnectivityDataset(
+        #     data_dir=DATA_DIR,
+        #     labels_csv=LABELS_CSV,
+        #     contrast_type=CONTRAST_TYPE,
+        #     threshold=THRESHOLD,
+        #     use_absolute=USE_ABSOLUTE,
+        #     logger=logger
+        # )
+
+        dataset = EnhancedBrainConnectivityDataset(
             data_dir=DATA_DIR,
             labels_csv=LABELS_CSV,
             contrast_type=CONTRAST_TYPE,
@@ -802,7 +887,8 @@ def main(config_path='configs/config.yaml'):
             class_weights=class_weights,
             use_focal_loss=USE_FOCAL_LOSS,
             focal_gamma=FOCAL_GAMMA,
-            logger=logger
+            logger=logger,
+            diversity_weight=0.1  # Add diversity penalty to prevent all-one-class predictions
         )
         
         best_val_metric = trainer.fit(

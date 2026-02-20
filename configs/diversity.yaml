@@ -1,0 +1,50 @@
+# GNN Training Configuration - With Diversity Penalty & Enhanced Features
+# This config prevents the "predicting all one class" problem
+
+# Data Configuration
+data:
+  data_dir: '/shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/data'
+  labels_csv: '/shared/healthinfolab/datasets/ABCD/Irritability/WholeBrainTaskfMRI/UConn/subject_lists/CBCL_PLPH_m0m24_MID_n3705.csv'
+  contrast_type: 'reward'
+  threshold: 0.2
+  use_absolute: true
+
+# Model Architecture - Larger to handle more features
+model:
+  gnn_type: 'GCN'
+  hidden_channels: 64  # Increased for more capacity
+  num_layers: 2
+  dropout: 0.3          # Moderate dropout
+  pooling: 'mean'
+
+# Training Parameters
+training:
+  batch_size: 64        # Larger batches help with diversity penalty
+  learning_rate: 5e-4  # Slightly higher to learn faster
+  weight_decay: 1e-3  # Less regularization
+  epochs: 300
+  patience: 40
+  test_size: 0.2
+  val_size: 0.2
+  random_seed: 42
+
+# Class Imbalance Handling - Balanced approach
+imbalance:
+  use_class_weights: true   # Keep class weights
+  use_focal_loss: false     # Turn off focal loss (diversity penalty replaces it)
+  focal_gamma: 2.0
+  use_oversampling: false
+  monitor_metric: 'balanced_acc'
+
+# Output Settings
+output:
+  save_model: true
+  model_filename: 'brain_gnn_{contrast_type}_diversity.pt'
+  training_history_plot: 'training_history_{contrast_type}.png'
+  confusion_matrix_plot: 'confusion_matrix_{contrast_type}.png'
+  verbose: true
+
+# Device Settings
+device:
+  use_cuda: true
+  cuda_device: 0
