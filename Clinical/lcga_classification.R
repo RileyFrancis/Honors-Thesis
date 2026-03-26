@@ -528,15 +528,36 @@ violin_plots <- lapply(plot_vars, function(var) {
 
   label <- ifelse(var %in% names(var_labels), var_labels[[var]], var)
 
-  ggplot(df_plot, aes(x = latent_class, y = value, fill = latent_class)) +
+  # Informative y-axis label and optional limits per variable type
+  cbcl_t_vars <- c("cbcl_scr_syn_totprob_t", "cbcl_scr_syn_external_t",
+                   "cbcl_scr_syn_internal_t", "cbcl_scr_syn_aggressive_t",
+                   "cbcl_scr_syn_attention_t", "cbcl_scr_dsm5_adhd_t",
+                   "cbcl_scr_dsm5_opposit_t", "cbcl_scr_dsm5_depress_t")
+
+  y_label <- dplyr::case_when(
+    var %in% cbcl_t_vars        ~ "T-score (mean=50, SD=10)",
+    var == "ders_total"         ~ "Sum score (20 items, 1\u20135 scale)",
+    var == "ders_irritation"    ~ "Rating (1=Never, 5=Always)",
+    var == "odd_symptom_count"  ~ "Symptoms endorsed (out of 25)",
+    TRUE                        ~ "Value"
+  )
+
+  y_limits <- if (var == "ders_irritation") c(1, 5) else NULL
+
+  p <- ggplot(df_plot, aes(x = latent_class, y = value, fill = latent_class)) +
     geom_violin(trim = TRUE, alpha = 0.6, color = NA) +
     geom_boxplot(width = 0.15, outlier.size = 0.3,
                  fill = "white", color = "grey30") +
     scale_fill_manual(values = class_palette) +
-    labs(title = label, x = NULL, y = "Value") +
+    labs(title = label, x = NULL, y = y_label) +
     theme_bw(base_size = 11) +
     theme(legend.position = "none",
           axis.text.x = element_text(size = 8))
+
+  if (!is.null(y_limits))
+    p <- p + coord_cartesian(ylim = y_limits)
+
+  p
 })
 
 # Remove NULL plots before arranging — prevents empty/black filler panels
