@@ -2,31 +2,41 @@ Variable,Type,"Class 1
 Low-Stable","Class 2
 High-Decreasing","Class 3
 Low-Increasing",p_fdr,sig
-age_years,Continuous,9.92 (0.62),9.87 (0.61),9.91 (0.63),0.0873,ns
+age_years,Continuous,9.92 (0.62),9.87 (0.61),9.91 (0.63),0.0667,ns
+cbcl_scr_syn_anxdep_t,Continuous,52.44 (4.63),60.54 (9.12),58.14 (7.99),0,***
+cbcl_scr_syn_withdep_t,Continuous,52.61 (4.67),60.07 (8.86),57.25 (7.55),0,***
+cbcl_scr_syn_somatic_t,Continuous,54.16 (5.40),59.54 (7.88),58.27 (7.41),0,***
+cbcl_scr_syn_social_t,Continuous,51.94 (3.54),58.52 (7.56),56.64 (6.65),0,***
+cbcl_scr_syn_thought_t,Continuous,52.77 (4.69),60.63 (8.53),58.48 (7.85),0,***
+cbcl_scr_syn_attention_t,Continuous,52.88 (4.86),61.03 (9.54),58.31 (8.20),0,***
+cbcl_scr_syn_rulebreak_t,Continuous,51.88 (3.69),58.74 (7.59),56.88 (6.86),0,***
+cbcl_scr_syn_aggressive_t,Continuous,51.30 (2.93),63.83 (8.22),59.13 (7.64),0,***
+cbcl_scr_syn_internal_t,Continuous,46.58 (9.58),60.55 (10.20),57.24 (10.09),0,***
+cbcl_scr_syn_external_t,Continuous,43.20 (8.44),62.24 (7.73),57.45 (8.73),0,***
+cbcl_scr_syn_totprob_t,Continuous,43.35 (9.79),61.93 (8.67),57.71 (9.28),0,***
 cbcl_scr_dsm5_adhd_t,Continuous,52.24 (4.36),60.01 (8.44),57.54 (7.78),0,***
 cbcl_scr_dsm5_depress_t,Continuous,52.53 (4.43),60.88 (8.27),58.35 (7.66),0,***
 cbcl_scr_dsm5_anxdisord_t,Continuous,52.50 (4.76),60.36 (9.77),57.77 (8.46),0,***
 cbcl_scr_dsm5_opposit_t,Continuous,51.98 (3.20),64.29 (7.22),59.56 (6.77),0,***
 cbcl_scr_dsm5_conduct_t,Continuous,51.91 (3.94),60.46 (8.58),58.10 (7.88),0,***
 adhd_symptom_count,Continuous,10786.63 (14484.76),4448.43 (10688.94),6610.40 (12478.66),0,***
-reappraisal,Continuous,3.32 (0.67),3.34 (0.74),3.28 (0.70),0.6327,ns
-suppression,Continuous,3.01 (1.05),3.01 (1.13),3.07 (1.12),0.5959,ns
-erq_control,Continuous,2.96 (1.08),2.96 (1.13),3.06 (1.13),0.2135,ns
-fam_conflict,Continuous,0.16 (0.23),0.35 (0.33),0.30 (0.30),0,***
+ders_total,Continuous,42.39 (12.95),52.87 (16.98),57.82 (17.60),0,***
+ders_irritation,Continuous,1.50 (0.78),1.94 (1.04),2.07 (1.16),0,***
+odd_symptom_count,Continuous,1.24 (2.60),5.61 (4.90),4.84 (4.53),0,***
 sex: Female,Categorical,4877 (48.6%),350 (42.2%),449 (45.1%),,ns
 sex: Intersex-Female,Categorical,0 (0.0%),0 (0.0%),0 (0.0%),,ns
 sex: Intersex-Male,Categorical,3 (0.0%),0 (0.0%),0 (0.0%),,ns
 sex: Male,Categorical,5161 (51.4%),479 (57.8%),547 (54.9%),,ns
-race_eth: Asian,Categorical,552 (5.5%),24 (2.9%),33 (3.3%),0.0024,**
-race_eth: Black,Categorical,1942 (19.3%),162 (19.5%),198 (19.9%),0.0024,**
-race_eth: Hispanic,Categorical,2068 (20.6%),160 (19.3%),182 (18.3%),0.0024,**
-race_eth: Other/Multiracial,Categorical,145 (1.4%),10 (1.2%),16 (1.6%),0.0024,**
-race_eth: White,Categorical,5334 (53.1%),473 (57.1%),567 (56.9%),0.0024,**
+race_eth: Asian,Categorical,552 (5.5%),24 (2.9%),33 (3.3%),0.0017,**
+race_eth: Black,Categorical,1942 (19.3%),162 (19.5%),198 (19.9%),0.0017,**
+race_eth: Hispanic,Categorical,2068 (20.6%),160 (19.3%),182 (18.3%),0.0017,**
+race_eth: Other/Multiracial,Categorical,145 (1.4%),10 (1.2%),16 (1.6%),0.0017,**
+race_eth: White,Categorical,5334 (53.1%),473 (57.1%),567 (56.9%),0.0017,**
 income_group: $50k-$99k,Categorical,2593 (28.2%),194 (25.8%),281 (30.8%),0,***
 income_group: < $50k,Categorical,2631 (28.6%),278 (36.9%),313 (34.3%),0,***
 income_group: >= $100k,Categorical,3961 (43.1%),281 (37.3%),318 (34.9%),0,***
-parent_edu: College+,Categorical,8285 (82.6%),676 (81.7%),842 (84.7%),0.4333,ns
-parent_edu: No college,Categorical,665 (6.6%),57 (6.9%),64 (6.4%),0.4333,ns
-parent_edu: Some college,Categorical,1078 (10.7%),94 (11.4%),88 (8.9%),0.4333,ns
+parent_edu: College+,Categorical,8285 (82.6%),676 (81.7%),842 (84.7%),0.3755,ns
+parent_edu: No college,Categorical,665 (6.6%),57 (6.9%),64 (6.4%),0.3755,ns
+parent_edu: Some college,Categorical,1078 (10.7%),94 (11.4%),88 (8.9%),0.3755,ns
 married: Married,Categorical,6849 (68.2%),489 (59.0%),644 (64.7%),0,***
 married: Not married,Categorical,3191 (31.8%),340 (41.0%),352 (35.3%),0,***

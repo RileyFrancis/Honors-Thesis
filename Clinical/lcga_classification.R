@@ -9,6 +9,8 @@
 #   3. abcd_cbcl01.txt             — CBCL syndrome + broadband scores
 #   4. abcd_cbcls01.txt            — CBCL DSM-oriented scales
 #   5. abcd_ksad01.txt             — K-SADS parent diagnostic interview
+#   6. diff_emotion_reg_p01.txt    — DERS parent-report emotion dysregulation
+#   7. opp_defiant_disorder_p01.txt   — ODD symptom items (K-SADS)
 #
 # Outputs:
 #   - characterization_summary.csv     : formatted Table 2 (means/% + p-values)
@@ -74,15 +76,23 @@ load_abcd <- function(filename, abcd_path, eventname = BASELINE,
     warning(sprintf("File not found: %s", fpath))
     return(NULL)
   }
-  # Row 2 in ABCD files is a variable-description row — read header
-  # from row 1, then skip rows 1-2 and re-attach the header
+  # Read true column names from row 1.
   col_names <- names(fread(fpath, nrows = 0))
-  dt <- fread(fpath, skip = 2, col.names = col_names,
+
+  # Auto-detect how many header rows to skip.
+  # Most ABCD files have 2 (col names + descriptor). Some only have 1.
+  # If row 2's first field equals the first col name, it is another header row.
+  row2_val <- as.character(fread(fpath, skip = 1, nrows = 1, header = FALSE)[[1]])
+  n_skip   <- if (row2_val == col_names[1]) 2L else 1L
+
+  dt <- fread(fpath, skip = n_skip, col.names = col_names,
               na.strings = c("", "NA", "999", "777", "999.0"))
 
-  # Filter to baseline only if eventname column exists
-  if ("eventname" %in% names(dt) && !is.null(eventname))
-    dt <- dt[eventname == BASELINE]
+  # Filter to requested eventname. Use $ to avoid data.table NSE name clash.
+  if (!is.null(eventname) && "eventname" %in% names(dt)) {
+    ev <- eventname
+    dt <- dt[dt$eventname == ev]
+  }
 
   # Select only requested columns (always keep IDs)
   id_cols <- intersect(c("src_subject_id", "eventname"), names(dt))
@@ -91,8 +101,8 @@ load_abcd <- function(filename, abcd_path, eventname = BASELINE,
     dt   <- dt[, ..keep]
   }
 
-  cat(sprintf("  Loaded %-30s  %d rows, %d cols\n",
-              filename, nrow(dt), ncol(dt)))
+  cat(sprintf("  Loaded %-30s  %d rows, %d cols  [skip=%d]\n",
+              filename, nrow(dt), ncol(dt), n_skip))
   dt
 }
 
@@ -170,7 +180,9 @@ if (!is.null(dem)) {
                  income_group, parent_edu, married)]
 }
 
-# ---- 5b. CBCL syndrome scores (abcd_cbcl01) ---------------------------------
+# ---- 5b+5c. CBCL syndrome + DSM-oriented scores (both in abcd_cbcls01) ------
+# NOTE: cbcl_scr_syn_* T-scores are NOT in abcd_cbcl01.txt in this package —
+# they are in abcd_cbcls01.txt alongside the DSM-oriented scales.
 cbcl_cols <- c(
   "cbcl_scr_syn_anxdep_t",      # Anxious/Depressed T-score
   "cbcl_scr_syn_withdep_t",     # Withdrawn/Depressed T-score
@@ -182,13 +194,7 @@ cbcl_cols <- c(
   "cbcl_scr_syn_aggressive_t",  # Aggressive Behavior T-score
   "cbcl_scr_syn_internal_t",    # Internalizing T-score
   "cbcl_scr_syn_external_t",    # Externalizing T-score
-  "cbcl_scr_syn_totprob_t"      # Total Problems T-score
-)
-
-cbcl <- load_abcd("abcd_cbcl01.txt", ABCD_PATH, cols = cbcl_cols)
-
-# ---- 5c. CBCL DSM-oriented scales (abcd_cbcls01) ----------------------------
-cbcls_cols <- c(
+  "cbcl_scr_syn_totprob_t",     # Total Problems T-score
   "cbcl_scr_dsm5_adhd_t",       # ADHD DSM5 T-score
   "cbcl_scr_dsm5_depress_t",    # Depressive Problems T-score
   "cbcl_scr_dsm5_anxdisord_t",  # Anxiety Problems T-score
@@ -196,7 +202,8 @@ cbcls_cols <- c(
   "cbcl_scr_dsm5_conduct_t"     # Conduct Problems T-score
 )
 
-cbcls <- load_abcd("abcd_cbcls01.txt", ABCD_PATH, cols = cbcls_cols)
+cbcl  <- load_abcd("abcd_cbcls01.txt", ABCD_PATH, cols = cbcl_cols)
+cbcls <- NULL   # all scores now loaded in cbcl above
 
 # ---- 5d. K-SADS ADHD (abcd_ksad01) -----------------------------------------
 # Sum of ADHD symptom items (18 items, binary 0/1)
@@ -214,96 +221,78 @@ if (!is.null(ksad)) {
   }
 }
 
-# ---- 5e. Emotion Regulation (ERQ) ------------------------------------------
+# ---- 5e. DERS — Difficulties in Emotion Regulation (diff_emotion_reg_p01) ---
+# This file has no baseline rows — it was collected at follow-up only.
+# We load all timepoints (eventname = NULL) and take each subject's earliest
+# available observation so we have one row per subject.
 
-emo <- load_abcd("emotion_reg_erq_feelings01.txt", ABCD_PATH, eventname = NULL)
+ders_raw <- load_abcd("diff_emotion_reg_p01.txt", ABCD_PATH, eventname = NULL)
 
-if (!is.null(emo)) {
+if (!is.null(ders_raw) && nrow(ders_raw) > 0) {
+  upset_items <- grep("^ders_upset_", names(ders_raw), value = TRUE)
 
-  clean_erq <- function(x) {
-    x <- suppressWarnings(as.numeric(x))
-    x[x < 1 | x > 5] <- NA   # ERQ is 1–5 scale
-    return(x)
+  if (length(upset_items) > 0) {
+    # Coerce to numeric and clamp to valid Likert range (1-5); 777 -> NA
+    clamp15 <- function(x) { x <- suppressWarnings(as.numeric(x)); x[x < 1 | x > 5] <- NA; x }
+    ders_raw[, (upset_items) := lapply(.SD, clamp15), .SDcols = upset_items]
+
+    ders_raw[, ders_total := rowSums(.SD, na.rm = TRUE), .SDcols = upset_items]
+
+    if ("ders_upset_irritation_p" %in% names(ders_raw)) {
+      ders_raw[, ders_irritation := clamp15(ders_upset_irritation_p)]
+    } else {
+      ders_raw[, ders_irritation := NA_real_]
+      warning("ders_upset_irritation_p not found.")
+    }
+
+    # One row per subject: keep earliest timepoint
+    # interview_age is in months — lower = earlier
+    ders_raw[, interview_age := suppressWarnings(as.numeric(interview_age))]
+    setorder(ders_raw, src_subject_id, interview_age)
+    ders <- unique(ders_raw[, .(src_subject_id, ders_total, ders_irritation)],
+                   by = "src_subject_id")
+
+    cat(sprintf("  DERS: %d subjects with data (earliest timepoint used)\n", nrow(ders)))
+  } else {
+    warning("No ders_upset_ items found in diff_emotion_reg_p01.txt.")
+    ders <- NULL
   }
-
-  emo[, `:=`(
-    erq_control   = clean_erq(erq_feelings_control),
-    erq_hide      = clean_erq(erq_feelings_hide),
-    erq_less_bad  = clean_erq(erq_feelings_less_bad),
-    erq_think     = clean_erq(erq_feelings_think),
-    erq_self      = clean_erq(erq_feelings_self),
-    erq_happy     = clean_erq(erq_feelings_happy)
-  )]
-
-  emo[, reappraisal := rowMeans(.SD, na.rm = TRUE),
-      .SDcols = c("erq_less_bad", "erq_think", "erq_self", "erq_happy")]
-
-  emo[, suppression := erq_hide]
-
-  emo <- emo[, .(
-    src_subject_id,
-    reappraisal,
-    suppression,
-    erq_control
-  )]
+} else {
+  warning("diff_emotion_reg_p01.txt loaded 0 rows — DERS will be excluded.")
+  ders <- NULL
 }
 
-# ---- 5f. Family Environment (FES) -------------------------------------------
+# ---- 5f. ODD — Oppositional Defiant Disorder (opp_defiant_disorder_p01) -----
+# The file contains a mix of binary symptom items (0/1) and free-text duration
+# fields (e.g. "weeks:0months:3years:0"). We sum only the strictly binary
+# columns (all values in {0, 1, NA}) to get a clean symptom count.
 
-fam_raw <- load_abcd("fes02.txt", ABCD_PATH)
+odd_raw <- load_abcd("opp_defiant_disorder_p01.txt", ABCD_PATH)
 
-if (!is.null(fam_raw)) {
+if (!is.null(odd_raw) && nrow(odd_raw) > 0) {
+  odd_candidates <- grep("^ksads_odd_raw_", names(odd_raw), value = TRUE)
 
-  # Diagnostic: print available FES column names so mismatches are visible
-  fes_cols_found    <- grep("^fes_",        names(fam_raw), value = TRUE)
-  fam_enviro_found  <- grep("^fam_enviro",  names(fam_raw), value = TRUE)
-  cat("\n  FES cohesion columns found:  ", paste(fes_cols_found,   collapse = ", "), "\n")
-  cat("  FES conflict columns found:  ", paste(fam_enviro_found,  collapse = ", "), "\n\n")
-
-  # ---- Conflict items ----
-  # Expected: fam_enviro1_p, fam_enviro3_p, fam_enviro5_p, fam_enviro6_p
-  conflict_cols <- intersect(
-    c("fam_enviro1_p", "fam_enviro3_p", "fam_enviro5_p", "fam_enviro6_p"),
-    names(fam_raw)
-  )
-
-  # ---- Cohesion items ----
-  # Expected: fes_31_p, fes_32_p, fes_37_p, fes_42_p, fes_71_p
-  cohesion_cols <- intersect(
-    c("fes_31_p", "fes_32_p", "fes_37_p", "fes_42_p", "fes_71_p"),
-    names(fam_raw)
-  )
-
-  # Warn if any expected columns are missing
-  if (length(conflict_cols) == 0)
-    warning("No FES conflict columns matched — fam_conflict will be all NA. ",
-            "Check fam_enviro column names printed above.")
-  if (length(cohesion_cols) == 0)
-    warning("No FES cohesion columns matched — fam_cohesion will be all NA. ",
-            "Check fes_ column names printed above.")
-
-  fam <- copy(fam_raw[, .(src_subject_id)])
-
-  # Conflict composite (higher = more conflict)
-  if (length(conflict_cols) > 0) {
-    conflict_mat <- fam_raw[, lapply(.SD, function(x) suppressWarnings(as.numeric(x))),
-                             .SDcols = conflict_cols]
-    fam[, fam_conflict := rowMeans(conflict_mat, na.rm = TRUE)]
-  } else {
-    fam[, fam_conflict := NA_real_]
+  # Keep only columns whose non-NA values are all 0 or 1
+  is_binary <- function(col) {
+    vals <- suppressWarnings(as.numeric(odd_raw[[col]]))
+    all(is.na(vals) | vals %in% c(0, 1))
   }
+  odd_items <- Filter(is_binary, odd_candidates)
 
-  # Cohesion composite (higher = better environment)
-  if (length(cohesion_cols) > 0) {
-    cohesion_mat <- fam_raw[, lapply(.SD, function(x) suppressWarnings(as.numeric(x))),
-                             .SDcols = cohesion_cols]
-    fam[, fam_cohesion := rowMeans(cohesion_mat, na.rm = TRUE)]
+  cat(sprintf("  ODD: %d binary items retained out of %d total\n",
+              length(odd_items), length(odd_candidates)))
+
+  if (length(odd_items) > 0) {
+    odd_raw[, (odd_items) := lapply(.SD, function(x) suppressWarnings(as.numeric(x))),
+            .SDcols = odd_items]
+    odd_raw[, odd_symptom_count := rowSums(.SD, na.rm = TRUE), .SDcols = odd_items]
+    odd <- odd_raw[, .(src_subject_id, odd_symptom_count)]
   } else {
-    fam[, fam_cohesion := NA_real_]
+    warning("No binary ODD items found — odd_symptom_count will be excluded.")
+    odd <- NULL
   }
-
 } else {
-  fam <- NULL
+  odd <- NULL
 }
 
 # --- 6. Merge Everything with Class Assignments -------------------------------
@@ -311,7 +300,7 @@ if (!is.null(fam_raw)) {
 cat("\nMerging data...\n")
 
 merged <- classes
-for (dt in list(dem, cbcl, cbcls, ksad, emo, fam)) {
+for (dt in list(dem, cbcl, cbcls, ksad, ders, odd)) {
   if (!is.null(dt))
     merged <- merge(merged, dt, by = "src_subject_id", all.x = TRUE)
 }
@@ -333,11 +322,9 @@ continuous_vars <- c(
     "cbcl_scr_dsm5_anxdisord_t", "cbcl_scr_dsm5_opposit_t",
     "cbcl_scr_dsm5_conduct_t",
     "adhd_symptom_count",
-    "reappraisal",
-    "suppression",
-    "erq_control",
-    "fam_conflict",
-    "fam_cohesion"
+    "ders_total",        # DERS total emotion dysregulation
+    "ders_irritation",   # DERS irritation item (single, directly taps irritability)
+    "odd_symptom_count"  # ODD binary symptom count
 )
 
 # Categorical variables: Chi-square
@@ -496,22 +483,21 @@ print(summary_table, n = Inf)
 cat("\nGenerating plots...\n")
 
 class_palette <- c(
-  "Class 1\nLow-Stable"       = "#E41A1C",
-  "Class 2\nHigh-Decreasing"  = "#377EB8",
-  "Class 3\nLow-Increasing"   = "#4DAF4A"
+  "Class 1\nLow-Stable"       = "#4f8bc8",
+  "Class 2\nHigh-Decreasing"  = "#8b3fca",
+  "Class 3\nLow-Increasing"   = "#cb6587"
 )
 
-# Violin + boxplot for key CBCL T-scores
+# Violin + boxplot for key variables
 plot_vars <- intersect(
   c(
     "cbcl_scr_syn_totprob_t", "cbcl_scr_syn_external_t",
     "cbcl_scr_syn_internal_t", "cbcl_scr_syn_aggressive_t",
     "cbcl_scr_syn_attention_t", "cbcl_scr_dsm5_adhd_t",
     "cbcl_scr_dsm5_opposit_t",  "cbcl_scr_dsm5_depress_t",
-    "reappraisal",
-    "suppression",
-    "fam_conflict",
-    "fam_cohesion"
+    "ders_total",
+    "ders_irritation",
+    "odd_symptom_count"
   ),
   names(merged)
 )
@@ -525,11 +511,9 @@ var_labels <- c(
     cbcl_scr_dsm5_adhd_t      = "ADHD (DSM5)",
     cbcl_scr_dsm5_opposit_t   = "ODD (DSM5)",
     cbcl_scr_dsm5_depress_t   = "Depression (DSM5)",
-    reappraisal               = "Reappraisal (ERQ)",
-    suppression               = "Suppression (ERQ)",
-    erq_control               = "Emotion Control",
-    fam_conflict              = "Family Conflict",
-    fam_cohesion              = "Family Cohesion"
+    ders_total                = "Emotion Dysregulation (DERS)",
+    ders_irritation           = "Irritation Item (DERS)",
+    odd_symptom_count         = "ODD Symptoms"
 )
 
 violin_plots <- lapply(plot_vars, function(var) {

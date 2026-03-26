@@ -1,40 +1,139 @@
 variable,comparison,Z,p_raw,p_fdr,sig
 age_years,"Class 1
 Low-Stable - Class 2
-High-Decreasing",2.344,0.00953702875236455,0.0157360974414015,*
+High-Decreasing",2.344,0.00953702875236455,0.0103591864034305,*
 age_years,"Class 1
 Low-Stable - Class 3
-Low-Increasing",0.236,0.406628821142057,0.432862938635093,ns
+Low-Increasing",0.236,0.406628821142057,0.406628821142057,ns
 age_years,"Class 2
 High-Decreasing - Class 3
-Low-Increasing",-1.635,0.0510413126061491,0.0701818048334549,ns
+Low-Increasing",-1.635,0.0510413126061491,0.0527147982653671,ns
+cbcl_scr_syn_anxdep_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-31.476,9.16755263402285e-218,3.8503721062896e-217,***
+cbcl_scr_syn_anxdep_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-27.457,2.83907151795425e-166,6.62450020855993e-166,***
+cbcl_scr_syn_anxdep_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",4.782,8.66400904604235e-07,1.09166513980134e-06,***
+cbcl_scr_syn_withdep_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-29.796,2.22725573622278e-195,7.01585556910175e-195,***
+cbcl_scr_syn_withdep_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-23.636,8.21190679298496e-124,1.61671914986891e-123,***
+cbcl_scr_syn_withdep_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",6.192,2.97791702364128e-10,4.46687553546193e-10,***
+cbcl_scr_syn_somatic_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-20.879,4.14786950777882e-97,7.68575820559017e-97,***
+cbcl_scr_syn_somatic_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-18.207,2.2830544426485e-74,4.10949799676729e-74,***
+cbcl_scr_syn_somatic_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",3.177,0.000744447207129336,0.000837503108020503,***
+cbcl_scr_syn_social_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-32.564,6.59767953091721e-233,3.46378175373154e-232,***
+cbcl_scr_syn_social_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-28.798,1.15066942730085e-182,3.02050724666474e-182,***
+cbcl_scr_syn_social_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",4.671,1.49814248112674e-06,1.85064659433303e-06,***
+cbcl_scr_syn_thought_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-30.223,5.86789571300196e-201,1.94567068378486e-200,***
+cbcl_scr_syn_thought_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-27.006,6.25953389817649e-161,1.40839512708971e-160,***
+cbcl_scr_syn_thought_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",4.138,1.74974303879249e-05,2.00425111716231e-05,***
+cbcl_scr_syn_attention_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-30.873,1.35719499143545e-209,5.3439552787771e-209,***
+cbcl_scr_syn_attention_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-25.819,2.73501074156232e-147,5.74352255728088e-147,***
+cbcl_scr_syn_attention_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",5.477,2.16014856641284e-08,2.95846434095671e-08,***
+cbcl_scr_syn_rulebreak_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-32.27,9.31575934621314e-229,4.51456029854945e-228,***
+cbcl_scr_syn_rulebreak_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-28.853,2.31914985994864e-183,6.35245396420715e-183,***
+cbcl_scr_syn_rulebreak_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",4.406,5.27599230012248e-06,6.27146254542861e-06,***
+cbcl_scr_syn_aggressive_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-50.16,0,0,***
+cbcl_scr_syn_aggressive_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-42.064,0,0,***
+cbcl_scr_syn_aggressive_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",8.816,5.9094221278724e-19,9.54598959117849e-19,***
+cbcl_scr_syn_internal_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-32.697,8.50431775303042e-235,4.87065471309924e-234,***
+cbcl_scr_syn_internal_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-28.628,1.51241008720043e-180,3.81127341974509e-180,***
+cbcl_scr_syn_internal_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",4.893,4.95542742230485e-07,6.50399849177511e-07,***
+cbcl_scr_syn_external_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-43.807,0,0,***
+cbcl_scr_syn_external_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-38.708,0,0,***
+cbcl_scr_syn_external_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",6.306,1.42761232839449e-10,2.19364821192324e-10,***
+cbcl_scr_syn_totprob_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-40.78,0,0,***
+cbcl_scr_syn_totprob_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-36.659,1.64538622107451e-294,1.29574164909618e-293,***
+cbcl_scr_syn_totprob_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",5.428,2.84854842319614e-08,3.81826703534802e-08,***
 cbcl_scr_dsm5_adhd_t,"Class 1
 Low-Stable - Class 2
-High-Decreasing",-32.098,2.35334680301996e-226,1.55320888999318e-225,***
+High-Decreasing",-32.098,2.35334680301996e-226,1.05900606135898e-225,***
 cbcl_scr_dsm5_adhd_t,"Class 1
 Low-Stable - Class 3
-Low-Increasing",-26.821,9.30349992913137e-159,3.41128330734817e-158,***
+Low-Increasing",-26.821,9.30349992913137e-159,2.0211051570182e-158,***
 cbcl_scr_dsm5_adhd_t,"Class 2
 High-Decreasing - Class 3
-Low-Increasing",5.71,5.64428153586437e-09,1.32279956169301e-08,***
+Low-Increasing",5.71,5.64428153586437e-09,8.2695287618478e-09,***
 cbcl_scr_dsm5_depress_t,"Class 1
 Low-Stable - Class 2
-High-Decreasing",-33.074,3.51562325873124e-240,2.90038918845327e-239,***
+High-Decreasing",-33.074,3.51562325873124e-240,2.21484265300068e-239,***
 cbcl_scr_dsm5_depress_t,"Class 1
 Low-Stable - Class 3
-Low-Increasing",-27.949,3.40704970159979e-172,1.40540800190991e-171,***
+Low-Increasing",-27.949,3.40704970159979e-172,8.25554350772258e-172,***
 cbcl_scr_dsm5_depress_t,"Class 2
 High-Decreasing - Class 3
-Low-Increasing",5.663,7.44820055244454e-09,1.53619136394169e-08,***
+Low-Increasing",5.663,7.44820055244454e-09,1.04274807734224e-08,***
 cbcl_scr_dsm5_anxdisord_t,"Class 1
 Low-Stable - Class 2
-High-Decreasing",-29.544,3.92119013594201e-192,1.84856106408695e-191,***
+High-Decreasing",-29.544,3.92119013594201e-192,1.1763570407826e-191,***
 cbcl_scr_dsm5_anxdisord_t,"Class 1
 Low-Stable - Class 3
-Low-Increasing",-25.243,6.72053233917397e-141,2.21777567192741e-140,***
+Low-Increasing",-25.243,6.72053233917397e-141,1.36578560441277e-140,***
 cbcl_scr_dsm5_anxdisord_t,"Class 2
 High-Decreasing - Class 3
-Low-Increasing",4.862,5.80132369853446e-07,1.1261393061861e-06,***
+Low-Increasing",4.862,5.80132369853446e-07,7.45884475525859e-07,***
 cbcl_scr_dsm5_opposit_t,"Class 1
 Low-Stable - Class 2
 High-Decreasing",-46.052,0,0,***
@@ -43,58 +142,49 @@ Low-Stable - Class 3
 Low-Increasing",-39.296,0,0,***
 cbcl_scr_dsm5_opposit_t,"Class 2
 High-Decreasing - Class 3
-Low-Increasing",7.616,1.30615947196007e-14,3.31563558266788e-14,***
+Low-Increasing",7.616,1.30615947196007e-14,2.05720116833712e-14,***
 cbcl_scr_dsm5_conduct_t,"Class 1
 Low-Stable - Class 2
-High-Decreasing",-35.494,3.06710008017392e-276,3.37381008819131e-275,***
+High-Decreasing",-35.494,3.06710008017392e-276,2.14697005612175e-275,***
 cbcl_scr_dsm5_conduct_t,"Class 1
 Low-Stable - Class 3
-Low-Increasing",-30.528,5.54212994943038e-205,3.04817147218671e-204,***
+Low-Increasing",-30.528,5.54212994943038e-205,2.05384815773008e-204,***
 cbcl_scr_dsm5_conduct_t,"Class 2
 High-Decreasing - Class 3
-Low-Increasing",5.699,6.01272528042279e-09,1.32279956169301e-08,***
+Low-Increasing",5.699,6.01272528042279e-09,8.60912937878718e-09,***
 adhd_symptom_count,"Class 1
 Low-Stable - Class 2
-High-Decreasing",-1.99,0.0232982723662491,0.0366115708612486,*
+High-Decreasing",-1.99,0.0232982723662491,0.0248778162554863,*
 adhd_symptom_count,"Class 1
 Low-Stable - Class 3
-Low-Increasing",-4.54,2.80710428326696e-06,5.1463578526561e-06,***
+Low-Increasing",-4.54,2.80710428326696e-06,3.40091480472728e-06,***
 adhd_symptom_count,"Class 2
 High-Decreasing - Class 3
-Low-Increasing",-1.679,0.0465984761442013,0.0668586831634193,ns
-reappraisal,"Class 1
+Low-Increasing",-1.679,0.0465984761442013,0.0489283999514114,*
+ders_total,"Class 1
 Low-Stable - Class 2
-High-Decreasing",-0.342,0.36605631722776,0.402661948950536,ns
-reappraisal,"Class 1
+High-Decreasing",-14.737,1.87717018518423e-49,3.28504782407241e-49,***
+ders_total,"Class 1
 Low-Stable - Class 3
-Low-Increasing",0.863,0.194139179824226,0.228806890507123,ns
-reappraisal,"Class 2
+Low-Increasing",-22.445,7.14811989264579e-112,1.3646410704142e-111,***
+ders_total,"Class 2
 High-Decreasing - Class 3
-Low-Increasing",0.869,0.192458721907222,0.228806890507123,ns
-suppression,"Class 1
+Low-Increasing",-4.349,6.82830330891551e-06,7.96635386040142e-06,***
+ders_irritation,"Class 1
 Low-Stable - Class 2
-High-Decreasing",-0.023,0.490984881344886,0.490984881344886,ns
-suppression,"Class 1
+High-Decreasing",-9.466,1.44782005076013e-21,2.40033324204969e-21,***
+ders_irritation,"Class 1
 Low-Stable - Class 3
-Low-Increasing",-1.081,0.139814999721601,0.177457499646647,ns
-suppression,"Class 2
+Low-Increasing",-12.372,1.85256337448093e-35,3.15436466465672e-35,***
+ders_irritation,"Class 2
 High-Decreasing - Class 3
-Low-Increasing",-0.739,0.229901025182367,0.261611511414417,ns
-erq_control,"Class 1
+Low-Increasing",-1.382,0.0835053881847222,0.0848522492844757,ns
+odd_symptom_count,"Class 1
 Low-Stable - Class 2
-High-Decreasing",0.027,0.489244279345266,0.490984881344886,ns
-erq_control,"Class 1
+High-Decreasing",-30.266,1.59507836052793e-201,5.58277426184775e-201,***
+odd_symptom_count,"Class 1
 Low-Stable - Class 3
-Low-Increasing",-1.871,0.0306486296579675,0.0459729444869512,*
-erq_control,"Class 2
+Low-Increasing",-28.912,4.24632834037779e-184,1.21599402474455e-183,***
+odd_symptom_count,"Class 2
 High-Decreasing - Class 3
-Low-Increasing",-1.332,0.0914338336388893,0.120692660403334,ns
-fam_conflict,"Class 1
-Low-Stable - Class 2
-High-Decreasing",-17.872,9.6572383738068e-72,2.89717151214204e-71,***
-fam_conflict,"Class 1
-Low-Stable - Class 3
-Low-Increasing",-15.816,1.21611510783356e-56,3.34431654654229e-56,***
-fam_conflict,"Class 2
-High-Decreasing - Class 3
-Low-Increasing",2.556,0.00528806758959902,0.00918453844509303,**
+Low-Increasing",2.834,0.00229534948899169,0.00253696522467502,**
