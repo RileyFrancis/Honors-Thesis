@@ -1,0 +1,100 @@
+variable,comparison,Z,p_raw,p_fdr,sig
+age_years,"Class 1
+Low-Stable - Class 2
+High-Decreasing",2.344,0.00953702875236455,0.0157360974414015,*
+age_years,"Class 1
+Low-Stable - Class 3
+Low-Increasing",0.236,0.406628821142057,0.432862938635093,ns
+age_years,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",-1.635,0.0510413126061491,0.0701818048334549,ns
+cbcl_scr_dsm5_adhd_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-32.098,2.35334680301996e-226,1.55320888999318e-225,***
+cbcl_scr_dsm5_adhd_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-26.821,9.30349992913137e-159,3.41128330734817e-158,***
+cbcl_scr_dsm5_adhd_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",5.71,5.64428153586437e-09,1.32279956169301e-08,***
+cbcl_scr_dsm5_depress_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-33.074,3.51562325873124e-240,2.90038918845327e-239,***
+cbcl_scr_dsm5_depress_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-27.949,3.40704970159979e-172,1.40540800190991e-171,***
+cbcl_scr_dsm5_depress_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",5.663,7.44820055244454e-09,1.53619136394169e-08,***
+cbcl_scr_dsm5_anxdisord_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-29.544,3.92119013594201e-192,1.84856106408695e-191,***
+cbcl_scr_dsm5_anxdisord_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-25.243,6.72053233917397e-141,2.21777567192741e-140,***
+cbcl_scr_dsm5_anxdisord_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",4.862,5.80132369853446e-07,1.1261393061861e-06,***
+cbcl_scr_dsm5_opposit_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-46.052,0,0,***
+cbcl_scr_dsm5_opposit_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-39.296,0,0,***
+cbcl_scr_dsm5_opposit_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",7.616,1.30615947196007e-14,3.31563558266788e-14,***
+cbcl_scr_dsm5_conduct_t,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-35.494,3.06710008017392e-276,3.37381008819131e-275,***
+cbcl_scr_dsm5_conduct_t,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-30.528,5.54212994943038e-205,3.04817147218671e-204,***
+cbcl_scr_dsm5_conduct_t,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",5.699,6.01272528042279e-09,1.32279956169301e-08,***
+adhd_symptom_count,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-1.99,0.0232982723662491,0.0366115708612486,*
+adhd_symptom_count,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-4.54,2.80710428326696e-06,5.1463578526561e-06,***
+adhd_symptom_count,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",-1.679,0.0465984761442013,0.0668586831634193,ns
+reappraisal,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-0.342,0.36605631722776,0.402661948950536,ns
+reappraisal,"Class 1
+Low-Stable - Class 3
+Low-Increasing",0.863,0.194139179824226,0.228806890507123,ns
+reappraisal,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",0.869,0.192458721907222,0.228806890507123,ns
+suppression,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-0.023,0.490984881344886,0.490984881344886,ns
+suppression,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-1.081,0.139814999721601,0.177457499646647,ns
+suppression,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",-0.739,0.229901025182367,0.261611511414417,ns
+erq_control,"Class 1
+Low-Stable - Class 2
+High-Decreasing",0.027,0.489244279345266,0.490984881344886,ns
+erq_control,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-1.871,0.0306486296579675,0.0459729444869512,*
+erq_control,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",-1.332,0.0914338336388893,0.120692660403334,ns
+fam_conflict,"Class 1
+Low-Stable - Class 2
+High-Decreasing",-17.872,9.6572383738068e-72,2.89717151214204e-71,***
+fam_conflict,"Class 1
+Low-Stable - Class 3
+Low-Increasing",-15.816,1.21611510783356e-56,3.34431654654229e-56,***
+fam_conflict,"Class 2
+High-Decreasing - Class 3
+Low-Increasing",2.556,0.00528806758959902,0.00918453844509303,**
