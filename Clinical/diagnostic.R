@@ -1,16 +1,20 @@
 library(data.table)
 ABCD_PATH <- "/shared/healthinfolab/datasets/ABCD/Package_1215452"
 
-# Check DERS with skip=1 instead of skip=2
-col_names <- names(fread(file.path(ABCD_PATH, "diff_emotion_reg_p01.txt"), nrows = 0))
-ders <- fread(file.path(ABCD_PATH, "diff_emotion_reg_p01.txt"), skip = 1, col.names = col_names)
-cat("DERS irritation values with skip=1:\n")
-print(table(ders$ders_upset_irritation_p, useNA = "always"))
+col_names <- names(fread(file.path(ABCD_PATH, "abcd_ksad01.txt"), nrows = 0))
+row2_val  <- as.character(fread(file.path(ABCD_PATH, "abcd_ksad01.txt"),
+                                 skip = 1, nrows = 1, header = FALSE)[[1]])
+n_skip <- if (row2_val == col_names[1]) 2L else 1L
 
-# Check which file actually has CBCL T-scores
-for (f in c("abcd_cbcl01.txt", "abcd_cbcls01.txt", "abcd_bpm01.txt")) {
-  cols <- names(fread(file.path(ABCD_PATH, f), nrows = 0))
-  syn_cols <- grep("cbcl_scr_syn", cols, value = TRUE)
-  cat(sprintf("\n%s — cbcl_scr_syn cols: %d found\n", f, length(syn_cols)))
-  if (length(syn_cols) > 0) cat(paste(syn_cols[1:min(3,length(syn_cols))], collapse=", "), "\n")
+ksad <- fread(file.path(ABCD_PATH, "abcd_ksad01.txt"), skip = n_skip,
+              col.names = col_names,
+              na.strings = c("", "NA", "999", "777", "999.0"))
+
+ev <- "baseline_year_1_arm_1"
+ksad <- ksad[ksad$eventname == ev]
+
+cat("Rows at baseline:", nrow(ksad), "\n")
+for (col in c("ksads_1_3_p", "ksads_3_226_p", "ksads_15_432_p", "ksads_15_91_p")) {
+  cat(sprintf("\n%s:\n", col))
+  print(table(ksad[[col]], useNA = "always"))
 }

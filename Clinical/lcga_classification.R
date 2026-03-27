@@ -86,7 +86,7 @@ load_abcd <- function(filename, abcd_path, eventname = BASELINE,
   n_skip   <- if (row2_val == col_names[1]) 2L else 1L
 
   dt <- fread(fpath, skip = n_skip, col.names = col_names,
-              na.strings = c("", "NA", "999", "777", "999.0"))
+              na.strings = c("", "NA", "999", "777", "888", "999.0"))
 
   # Filter to requested eventname. Use $ to avoid data.table NSE name clash.
   if (!is.null(eventname) && "eventname" %in% names(dt)) {
@@ -205,20 +205,51 @@ cbcl_cols <- c(
 cbcl  <- load_abcd("abcd_cbcls01.txt", ABCD_PATH, cols = cbcl_cols)
 cbcls <- NULL   # all scores now loaded in cbcl above
 
-# ---- 5d. K-SADS ADHD (abcd_ksad01) -----------------------------------------
-# Sum of ADHD symptom items (18 items, binary 0/1)
+# ---- 5d. K-SADS ADHD + Irritability (abcd_ksad01) --------------------------
+# ADHD: sum of 18 symptom items (binary 0/1)
+# Irritability: 4 items identified by Lee et al. (2022, Front. Psychiatry)
+#   as the core transdiagnostic irritability indicators in the ABCD K-SADS:
+#     ksads_1_3_p   — Irritability Present (MDD module)
+#     ksads_3_229_p — Temper/irritability present in at least 2 settings (DMDD module)
+#     ksads_15_432_p — Often touchy or easily annoyed Present (ODD module)
+#     ksads_15_91_p  — Often loses temper Present (ODD module)
+
 ksad <- load_abcd("abcd_ksad01.txt", ABCD_PATH)
 
 if (!is.null(ksad)) {
+
+  # --- ADHD symptom count ---
   adhd_items <- grep("^ksads_14_", names(ksad), value = TRUE)
   if (length(adhd_items) > 0) {
+    clamp_binary <- function(x) { x <- suppressWarnings(as.numeric(x)); x[!x %in% c(0,1)] <- NA; x }
+    ksad[, (adhd_items) := lapply(.SD, clamp_binary), .SDcols = adhd_items]
     ksad[, adhd_symptom_count := rowSums(.SD, na.rm = TRUE),
          .SDcols = adhd_items]
-    ksad <- ksad[, .(src_subject_id, adhd_symptom_count)]
   } else {
     warning("No ADHD items found in abcd_ksad01.txt — check column names.")
-    ksad <- NULL
+    ksad[, adhd_symptom_count := NA_real_]
   }
+
+  # --- K-SADS irritability sum (0-4 scale) ---
+  irr_items <- c("ksads_1_3_p", "ksads_3_229_p",
+                 "ksads_15_432_p", "ksads_15_91_p")
+  irr_present <- intersect(irr_items, names(ksad))
+
+  if (length(irr_present) > 0) {
+    # Clamp to binary (0/1) — codes like 888 become NA
+    clamp_binary <- function(x) { x <- suppressWarnings(as.numeric(x)); x[!x %in% c(0,1)] <- NA; x }
+    ksad[, (irr_present) := lapply(.SD, clamp_binary), .SDcols = irr_present]
+    ksad[, ksads_irritability_sum := rowSums(.SD, na.rm = TRUE),
+         .SDcols = irr_present]
+    cat(sprintf("  K-SADS irritability: %d of 4 items found (%s)
+",
+                length(irr_present), paste(irr_present, collapse = ", ")))
+  } else {
+    warning("No K-SADS irritability items found — ksads_irritability_sum will be NA.")
+    ksad[, ksads_irritability_sum := NA_real_]
+  }
+
+  ksad <- ksad[, .(src_subject_id, adhd_symptom_count, ksads_irritability_sum)]
 }
 
 # ---- 5e. DERS — Difficulties in Emotion Regulation (diff_emotion_reg_p01) ---
@@ -322,6 +353,7 @@ continuous_vars <- c(
     "cbcl_scr_dsm5_anxdisord_t", "cbcl_scr_dsm5_opposit_t",
     "cbcl_scr_dsm5_conduct_t",
     "adhd_symptom_count",
+    "ksads_irritability_sum", # K-SADS 4-item irritability score (Lee et al., 2022)
     "ders_total",        # DERS total emotion dysregulation
     "ders_irritation",   # DERS irritation item (single, directly taps irritability)
     "odd_symptom_count"  # ODD binary symptom count
@@ -495,6 +527,7 @@ plot_vars <- intersect(
     "cbcl_scr_syn_internal_t", "cbcl_scr_syn_aggressive_t",
     "cbcl_scr_syn_attention_t", "cbcl_scr_dsm5_adhd_t",
     "cbcl_scr_dsm5_opposit_t",  "cbcl_scr_dsm5_depress_t",
+    "ksads_irritability_sum",
     "ders_total",
     "ders_irritation",
     "odd_symptom_count"
@@ -511,6 +544,7 @@ var_labels <- c(
     cbcl_scr_dsm5_adhd_t      = "ADHD (DSM5)",
     cbcl_scr_dsm5_opposit_t   = "ODD (DSM5)",
     cbcl_scr_dsm5_depress_t   = "Depression (DSM5)",
+    ksads_irritability_sum    = "Irritability Score (K-SADS, 0-4)",
     ders_total                = "Emotion Dysregulation (DERS)",
     ders_irritation           = "Irritation Item (DERS)",
     odd_symptom_count         = "ODD Symptoms"
@@ -535,14 +569,19 @@ violin_plots <- lapply(plot_vars, function(var) {
                    "cbcl_scr_dsm5_opposit_t", "cbcl_scr_dsm5_depress_t")
 
   y_label <- dplyr::case_when(
-    var %in% cbcl_t_vars        ~ "T-score (mean=50, SD=10)",
-    var == "ders_total"         ~ "Sum score (20 items, 1\u20135 scale)",
-    var == "ders_irritation"    ~ "Rating (1=Never, 5=Always)",
-    var == "odd_symptom_count"  ~ "Symptoms endorsed (out of 25)",
-    TRUE                        ~ "Value"
+    var %in% cbcl_t_vars             ~ "T-score (mean=50, SD=10)",
+    var == "ksads_irritability_sum"  ~ "Items endorsed (0=none, 4=all)",
+    var == "ders_total"              ~ "Sum score (20 items, 1\u20135 scale)",
+    var == "ders_irritation"         ~ "Rating (1=Never, 5=Always)",
+    var == "odd_symptom_count"       ~ "Symptoms endorsed (out of 25)",
+    TRUE                             ~ "Value"
   )
 
-  y_limits <- if (var == "ders_irritation") c(1, 5) else NULL
+  y_limits <- dplyr::case_when(
+    var == "ders_irritation"        ~ list(c(1, 5)),
+    var == "ksads_irritability_sum" ~ list(c(0, 4)),
+    TRUE                            ~ list(NULL)
+  )[[1]]
 
   p <- ggplot(df_plot, aes(x = latent_class, y = value, fill = latent_class)) +
     geom_violin(trim = TRUE, alpha = 0.6, color = NA) +

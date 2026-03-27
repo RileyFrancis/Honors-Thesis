@@ -2,7 +2,7 @@ Variable,Type,"Class 1
 Low-Stable","Class 2
 High-Decreasing","Class 3
 Low-Increasing",p_fdr,sig
-age_years,Continuous,9.92 (0.62),9.87 (0.61),9.91 (0.63),0.0667,ns
+age_years,Continuous,9.92 (0.62),9.87 (0.61),9.91 (0.63),0.0666,ns
 cbcl_scr_syn_anxdep_t,Continuous,52.44 (4.63),60.54 (9.12),58.14 (7.99),0,***
 cbcl_scr_syn_withdep_t,Continuous,52.61 (4.67),60.07 (8.86),57.25 (7.55),0,***
 cbcl_scr_syn_somatic_t,Continuous,54.16 (5.40),59.54 (7.88),58.27 (7.41),0,***
@@ -19,7 +19,8 @@ cbcl_scr_dsm5_depress_t,Continuous,52.53 (4.43),60.88 (8.27),58.35 (7.66),0,***
 cbcl_scr_dsm5_anxdisord_t,Continuous,52.50 (4.76),60.36 (9.77),57.77 (8.46),0,***
 cbcl_scr_dsm5_opposit_t,Continuous,51.98 (3.20),64.29 (7.22),59.56 (6.77),0,***
 cbcl_scr_dsm5_conduct_t,Continuous,51.91 (3.94),60.46 (8.58),58.10 (7.88),0,***
-adhd_symptom_count,Continuous,10786.63 (14484.76),4448.43 (10688.94),6610.40 (12478.66),0,***
+adhd_symptom_count,Continuous,5.40 (9.91),17.00 (16.00),14.59 (15.10),0,***
+ksads_irritability_sum,Continuous,0.05 (0.25),0.56 (0.89),0.38 (0.72),0,***
 ders_total,Continuous,42.39 (12.95),52.87 (16.98),57.82 (17.60),0,***
 ders_irritation,Continuous,1.50 (0.78),1.94 (1.04),2.07 (1.16),0,***
 odd_symptom_count,Continuous,1.24 (2.60),5.61 (4.90),4.84 (4.53),0,***
