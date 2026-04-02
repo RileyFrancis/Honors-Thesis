@@ -1,0 +1,9 @@
+From the Major Depressive Disorder module:
+    "Irritability Present"
+
+From the DMDD module:
+    "Temper outbursts occur 3 or more times per week"
+
+From the Oppositional Defiant Disorder module:
+    "Often touchy or easily annoyed Present"
+    "Often loses temper Present"

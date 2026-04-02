@@ -1,0 +1,85 @@
+variable,column,latent_class,n_plotted,n_missing,pct_missing
+ADHD (DSM5),cbcl_scr_dsm5_adhd_t,"Class 1
+Low-Stable",10036,5,0
+ADHD (DSM5),cbcl_scr_dsm5_adhd_t,"Class 2
+High-Decreasing",829,0,0
+ADHD (DSM5),cbcl_scr_dsm5_adhd_t,"Class 3
+Low-Increasing",995,1,0.1
+ADHD (DSM5),cbcl_scr_dsm5_adhd_t,TOTAL,11860,6,0.1
+Aggressive Behavior,cbcl_scr_syn_aggressive_t,"Class 1
+Low-Stable",10036,5,0
+Aggressive Behavior,cbcl_scr_syn_aggressive_t,"Class 2
+High-Decreasing",829,0,0
+Aggressive Behavior,cbcl_scr_syn_aggressive_t,"Class 3
+Low-Increasing",995,1,0.1
+Aggressive Behavior,cbcl_scr_syn_aggressive_t,TOTAL,11860,6,0.1
+Attention Problems,cbcl_scr_syn_attention_t,"Class 1
+Low-Stable",10036,5,0
+Attention Problems,cbcl_scr_syn_attention_t,"Class 2
+High-Decreasing",829,0,0
+Attention Problems,cbcl_scr_syn_attention_t,"Class 3
+Low-Increasing",995,1,0.1
+Attention Problems,cbcl_scr_syn_attention_t,TOTAL,11860,6,0.1
+DMDD Symptoms,dmdd_symptom_count,"Class 1
+Low-Stable",138,9903,98.6
+DMDD Symptoms,dmdd_symptom_count,"Class 2
+High-Decreasing",144,685,82.6
+DMDD Symptoms,dmdd_symptom_count,"Class 3
+Low-Increasing",122,874,87.8
+DMDD Symptoms,dmdd_symptom_count,TOTAL,404,11462,96.6
+Depression (DSM5),cbcl_scr_dsm5_depress_t,"Class 1
+Low-Stable",10036,5,0
+Depression (DSM5),cbcl_scr_dsm5_depress_t,"Class 2
+High-Decreasing",829,0,0
+Depression (DSM5),cbcl_scr_dsm5_depress_t,"Class 3
+Low-Increasing",995,1,0.1
+Depression (DSM5),cbcl_scr_dsm5_depress_t,TOTAL,11860,6,0.1
+Emotion Dysreg (PGBI),pgbi_total,"Class 1
+Low-Stable",10035,6,0.1
+Emotion Dysreg (PGBI),pgbi_total,"Class 2
+High-Decreasing",829,0,0
+Emotion Dysreg (PGBI),pgbi_total,"Class 3
+Low-Increasing",996,0,0
+Emotion Dysreg (PGBI),pgbi_total,TOTAL,11860,6,0.1
+Externalizing,cbcl_scr_syn_external_t,"Class 1
+Low-Stable",10036,5,0
+Externalizing,cbcl_scr_syn_external_t,"Class 2
+High-Decreasing",829,0,0
+Externalizing,cbcl_scr_syn_external_t,"Class 3
+Low-Increasing",995,1,0.1
+Externalizing,cbcl_scr_syn_external_t,TOTAL,11860,6,0.1
+Internalizing,cbcl_scr_syn_internal_t,"Class 1
+Low-Stable",10036,5,0
+Internalizing,cbcl_scr_syn_internal_t,"Class 2
+High-Decreasing",829,0,0
+Internalizing,cbcl_scr_syn_internal_t,"Class 3
+Low-Increasing",995,1,0.1
+Internalizing,cbcl_scr_syn_internal_t,TOTAL,11860,6,0.1
+Irritability (K-SADS),irritability_score,"Class 1
+Low-Stable",5719,4322,43
+Irritability (K-SADS),irritability_score,"Class 2
+High-Decreasing",596,233,28.1
+Irritability (K-SADS),irritability_score,"Class 3
+Low-Increasing",674,322,32.3
+Irritability (K-SADS),irritability_score,TOTAL,6989,4877,41.1
+ODD (DSM5),cbcl_scr_dsm5_opposit_t,"Class 1
+Low-Stable",10036,5,0
+ODD (DSM5),cbcl_scr_dsm5_opposit_t,"Class 2
+High-Decreasing",829,0,0
+ODD (DSM5),cbcl_scr_dsm5_opposit_t,"Class 3
+Low-Increasing",995,1,0.1
+ODD (DSM5),cbcl_scr_dsm5_opposit_t,TOTAL,11860,6,0.1
+ODD Symptoms,odd_symptom_count,"Class 1
+Low-Stable",9938,103,1
+ODD Symptoms,odd_symptom_count,"Class 2
+High-Decreasing",814,15,1.8
+ODD Symptoms,odd_symptom_count,"Class 3
+Low-Increasing",984,12,1.2
+ODD Symptoms,odd_symptom_count,TOTAL,11736,130,1.1
+Total Problems,cbcl_scr_syn_totprob_t,"Class 1
+Low-Stable",10036,5,0
+Total Problems,cbcl_scr_syn_totprob_t,"Class 2
+High-Decreasing",829,0,0
+Total Problems,cbcl_scr_syn_totprob_t,"Class 3
+Low-Increasing",995,1,0.1
+Total Problems,cbcl_scr_syn_totprob_t,TOTAL,11860,6,0.1
