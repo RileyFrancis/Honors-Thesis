@@ -327,7 +327,7 @@ make_violin <- function(var) {
   label <- ifelse(var %in% names(var_labels), var_labels[[var]], var)
 
   ggplot(df_plot, aes(x = latent_class, y = value, fill = latent_class)) +
-    geom_violin(trim = TRUE, alpha = 0.55, color = NA) +
+    geom_violin(trim = TRUE, alpha = 0.55, color = NA, scale = "width") +
     geom_boxplot(width = 0.15, outlier.size = 0.3, fill = "white", color = "grey30") +
     scale_fill_manual(values = class_palette) +
     labs(title = label, x = NULL, y = y_axis_label(var)) +

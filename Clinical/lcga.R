@@ -276,22 +276,15 @@ pred_list <- tryCatch({
 
 # --- 9. Visualization ---------------------------------------------------------
 
-# 9a. BIC Plot
-p_bic <- ggplot(model_fit_table, aes(x = Classes, y = BIC)) +
-  geom_line(color = "#2C7BB6", linewidth = 1) +
-  geom_point(color = "#2C7BB6", size = 3) +
-  geom_vline(xintercept = optimal_k, linetype = "dashed", color = "red", linewidth = 0.8) +
-  annotate("text", x = optimal_k + 0.15, y = max(model_fit_table$BIC),
-           label = sprintf("Optimal\nk = %d", optimal_k), color = "red", size = 3.5, hjust = 0) +
-  labs(title = "Model Selection: BIC by Number of Classes",
-       x = "Number of Latent Classes", y = "BIC (lower = better)") +
-  theme_bw(base_size = 12)
+# install RColorBrewer if missing
+if (!requireNamespace("RColorBrewer", quietly = TRUE))
+  install.packages("RColorBrewer", repos = "https://cloud.r-project.org")
+library(RColorBrewer)
 
-# 9b. Trajectory Plot
-# Build observed mean trajectories per assigned class
+# Shared data: join class assignments back to longitudinal data
 analysis_data_w_class <- analysis_data %>%
   left_join(
-    tibble(subject_int = class_probs$subject_int,
+    tibble(subject_int  = class_probs$subject_int,
            latent_class = factor(assigned_class)),
     by = "subject_int"
   )
@@ -309,29 +302,118 @@ class_sizes <- analysis_data_w_class %>%
 
 traj_means <- traj_means %>%
   left_join(class_sizes, by = "latent_class") %>%
-  mutate(class_label = sprintf("Class %s\n(n = %d)", latent_class, n_subjects))
+  mutate(class_label = sprintf("Class %s (n=%d)", latent_class, n_subjects))
 
-p_traj <- ggplot(traj_means, aes(x = .data[[TIME_VAR]], y = mean_outcome,
-                                  color = class_label, group = class_label)) +
-  geom_line(linewidth = 1.2) +
-  geom_point(size = 2.5) +
+# Fixed palette matching the characterization script exactly.
+# Keys are the integer class numbers as characters ("1", "2", "3").
+class_palette <- c(
+  "1" = "#4f8bc8",   # Class 1 Low-Stable      — blue
+  "2" = "#8b3fca",   # Class 2 High-Decreasing — purple
+  "3" = "#cb6587"    # Class 3 Low-Increasing  — pink
+)
+# Subset to however many classes were actually fitted
+n_cls         <- length(unique(assigned_class))
+class_palette <- class_palette[as.character(seq_len(n_cls))]
+
+# ── 9a. BIC Plot ──────────────────────────────────────────────────────────────────────────────────
+p_bic <- ggplot(model_fit_table, aes(x = Classes, y = BIC)) +
+  geom_line(color = "#2C7BB6", linewidth = 1) +
+  geom_point(color = "#2C7BB6", size = 3) +
+  geom_vline(xintercept = optimal_k, linetype = "dashed", color = "red", linewidth = 0.8) +
+  annotate("text", x = optimal_k + 0.15, y = max(model_fit_table$BIC),
+           label = sprintf("Optimal\nk = %d", optimal_k), color = "red", size = 3.5, hjust = 0) +
+  labs(title = "Model Selection: BIC by Number of Classes",
+       x = "Number of Latent Classes", y = "BIC (lower = better)") +
+  theme_bw(base_size = 12)
+
+# Build a class_label-keyed palette for trajectory plots.
+# traj_means has one row per (class x timepoint); get one label per class.
+class_label_lookup  <- traj_means %>%
+  distinct(latent_class, class_label) %>%
+  arrange(latent_class)
+
+class_label_palette <- setNames(
+  class_palette[as.character(class_label_lookup$latent_class)],
+  class_label_lookup$class_label
+)
+
+# ── 9b. Mean trajectory plot ───────────────────────────────────────────────────────────────────────────
+p_traj_mean <- ggplot(traj_means,
+                      aes(x = .data[[TIME_VAR]], y = mean_outcome,
+                          color = class_label, group = class_label)) +
   geom_ribbon(aes(ymin = mean_outcome - se_outcome,
                   ymax = mean_outcome + se_outcome,
                   fill = class_label), alpha = 0.15, color = NA) +
-  scale_x_continuous(breaks = TIMEFRAMES,
-                     labels = paste0(TIMEFRAMES, "m")) +
-  labs(title    = sprintf("LCGA Trajectories (%d-Class Solution)", optimal_k),
-       subtitle = "Mean ± SE of CBCL Irritability Index by Latent Class",
-       x        = "Time (months)",
-       y        = "CBCL Irritability Index",
-       color    = "Latent Class",
-       fill     = "Latent Class") +
+  geom_line(linewidth = 1.4) +
+  geom_point(size = 2.8) +
+  scale_x_continuous(breaks = TIMEFRAMES, labels = paste0(TIMEFRAMES, "m")) +
+  labs(title    = sprintf("LCGA Mean Trajectories (%d-Class Solution)", optimal_k),
+       subtitle = "Mean +/- SE of CBCL Irritability Index",
+       x = "Time (months)", y = "CBCL Irritability Index",
+       color = "Latent Class", fill = "Latent Class") +
+  scale_color_manual(values = class_label_palette) +
+  scale_fill_manual(values  = class_label_palette) +
   theme_bw(base_size = 12) +
   theme(legend.position = "right")
 
-# 9c. Class size bar chart
+# ── 9c. Individual trajectories — ALL classes on one plot ──────────────────────────────────────────────────
+MAX_INDIV_PER_CLASS <- 300
+set.seed(SET_SEED)
+
+indiv_sample <- analysis_data_w_class %>%
+  group_by(latent_class) %>%
+  group_modify(~ {
+    subj <- unique(.x$subject_int)
+    if (length(subj) > MAX_INDIV_PER_CLASS)
+      subj <- sample(subj, MAX_INDIV_PER_CLASS)
+    dplyr::filter(.x, subject_int %in% subj)
+  }) %>%
+  ungroup()
+
+p_indiv_all <- ggplot(indiv_sample,
+                      aes(x = .data[[TIME_VAR]], y = .data[[OUTCOME_VAR]],
+                          group = interaction(subject_int, latent_class),
+                          color = latent_class)) +
+  geom_line(alpha = 0.04, linewidth = 0.35) +
+  geom_line(data = traj_means,
+            aes(x = .data[[TIME_VAR]], y = mean_outcome,
+                group = class_label, color = latent_class),
+            linewidth = 1.6, inherit.aes = FALSE) +
+  scale_color_manual(values = setNames(class_palette, seq_len(length(class_palette))),
+                     name = "Latent Class") +
+  scale_x_continuous(breaks = TIMEFRAMES, labels = paste0(TIMEFRAMES, "m")) +
+  labs(title    = sprintf("Individual Trajectories — All Classes (%d-Class Solution)", optimal_k),
+       subtitle = sprintf("Faint lines = individuals (alpha=0.04); bold = class mean | up to %d per class", MAX_INDIV_PER_CLASS),
+       x = "Time (months)", y = "CBCL Irritability Index") +
+  theme_bw(base_size = 12) +
+  theme(legend.position = "right")
+
+# ── 9d. One plot per class ────────────────────────────────────────────────────────────────────────────────────
+indiv_plots <- lapply(sort(unique(assigned_class)), function(cls) {
+  cls_n      <- class_sizes$n_subjects[class_sizes$latent_class == cls]
+  cls_colour <- class_palette[as.character(cls)]
+  cls_mean   <- traj_means %>% dplyr::filter(latent_class == cls)
+  cls_data   <- indiv_sample %>% dplyr::filter(latent_class == cls)
+
+  ggplot(cls_data,
+         aes(x = .data[[TIME_VAR]], y = .data[[OUTCOME_VAR]],
+             group = subject_int)) +
+    geom_line(alpha = 0.06, linewidth = 0.35, color = cls_colour) +
+    geom_line(data = cls_mean,
+              aes(x = .data[[TIME_VAR]], y = mean_outcome, group = 1),
+              color = cls_colour, linewidth = 2.0, inherit.aes = FALSE) +
+    scale_x_continuous(breaks = TIMEFRAMES, labels = paste0(TIMEFRAMES, "m")) +
+    coord_cartesian(ylim = c(0, max(analysis_data[[OUTCOME_VAR]], na.rm = TRUE))) +
+    labs(title    = sprintf("Class %s — Individual Trajectories", cls),
+         subtitle = sprintf("n = %d subjects  |  bold line = class mean", cls_n),
+         x = "Time (months)", y = "CBCL Irritability Index") +
+    theme_bw(base_size = 13)
+})
+
+# ── 9e. Class size bar chart ────────────────────────────────────────────────────────────────────────────────
 p_size <- ggplot(class_sizes, aes(x = latent_class, y = n_subjects, fill = latent_class)) +
   geom_bar(stat = "identity", width = 0.6, show.legend = FALSE) +
+  scale_fill_manual(values = class_palette) +
   geom_text(aes(label = sprintf("%d\n(%.1f%%)", n_subjects,
                                 100 * n_subjects / sum(n_subjects))),
             vjust = -0.3, size = 3.5) +
@@ -339,16 +421,26 @@ p_size <- ggplot(class_sizes, aes(x = latent_class, y = n_subjects, fill = laten
        x = "Latent Class", y = "Number of Subjects") +
   theme_bw(base_size = 12)
 
-# Save all plots
-# Output directory: defaults to an "lcga_output" folder next to the script.
-# Change OUTPUT_DIR at the top of the script or set the env var LCGA_OUTPUT_DIR.
+# ── Save all plots ────────────────────────────────────────────────────────────────────────────────────────────────
 output_dir <- OUTPUT_DIR
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 cat(sprintf("Saving outputs to: %s\n", output_dir))
 
-ggsave(file.path(output_dir, "lcga_bic_plot.png"),      p_bic,   width = 7,  height = 5,  dpi = 150)
-ggsave(file.path(output_dir, "lcga_trajectories.png"),  p_traj,  width = 9,  height = 6,  dpi = 150)
-ggsave(file.path(output_dir, "lcga_class_sizes.png"),   p_size,  width = 6,  height = 5,  dpi = 150)
+ggsave(file.path(output_dir, "lcga_bic_plot.png"),
+       p_bic,        width = 7,  height = 5,  dpi = 150)
+ggsave(file.path(output_dir, "lcga_mean_trajectories.png"),
+       p_traj_mean,  width = 9,  height = 6,  dpi = 150)
+ggsave(file.path(output_dir, "lcga_individual_all_classes.png"),
+       p_indiv_all,  width = 11, height = 7,  dpi = 150)
+ggsave(file.path(output_dir, "lcga_class_sizes.png"),
+       p_size,       width = 6,  height = 5,  dpi = 150)
+
+for (i in seq_along(indiv_plots)) {
+  cls   <- sort(unique(assigned_class))[i]
+  fname <- sprintf("lcga_class%s_individual_trajectories.png", cls)
+  ggsave(file.path(output_dir, fname), indiv_plots[[i]], width = 8, height = 6, dpi = 150)
+  cat(sprintf("  Saved: %s\n", fname))
+}
 
 cat("\nPlots saved to output directory.\n")
 
