@@ -1,10 +1,10 @@
-filename,filepath,total_rows,total_columns,analyzed_columns,filled_rows,incomplete_rows,empty_rows,empty_cell_percentage,status
-opp_defiant_disorder_p01.txt,/home/rif17002/honors_thesis/ABCD_files/opp_defiant_disorder_p01.txt,33516,46,35,1,29750,3765,76.66,success
-diff_emotion_reg_p01.txt,/home/rif17002/honors_thesis/ABCD_files/diff_emotion_reg_p01.txt,6252,41,30,6148,104,0,1.61,success
-disruptive_mood_dysreg_p01.txt,/home/rif17002/honors_thesis/ABCD_files/disruptive_mood_dysreg_p01.txt,33516,22,11,653,0,32863,98.05,success
-disruptive_mood_dysreg01.txt,/home/rif17002/honors_thesis/ABCD_files/disruptive_mood_dysreg01.txt,33516,22,11,175,0,33341,99.48,success
-depressive_disorders01.txt,/home/rif17002/honors_thesis/ABCD_files/depressive_disorders01.txt,33516,102,91,1,20131,13384,92.87,success
-pdem02.txt,/home/rif17002/honors_thesis/ABCD_files/pdem02.txt,11877,135,124,1,11876,0,33.79,success
-depressive_disorders_p01.txt,/home/rif17002/honors_thesis/ABCD_files/depressive_disorders_p01.txt,33516,102,91,1,19978,13537,93.26,success
-abcd_cbcls01.txt,/home/rif17002/honors_thesis/ABCD_files/abcd_cbcls01.txt,39767,92,81,1,37293,2473,30.52,success
-abcd_cbcl01.txt,/home/rif17002/honors_thesis/ABCD_files/abcd_cbcl01.txt,39767,132,121,1,39766,0,1.24,success
+filename,filepath,total_rows,total_columns,analyzed_columns,filled_rows,incomplete_rows,empty_rows,empty_cell_percentage,data_dict_file,data_dict_status,total_variables,status
+opp_defiant_disorder_p01.txt,/home/rif17002/honors_thesis/ABCD_files/opp_defiant_disorder_p01.txt,33516,46,35,1,29750,3765,76.66,NOT FOUND,no match,0,success
+diff_emotion_reg_p01.txt,/home/rif17002/honors_thesis/ABCD_files/diff_emotion_reg_p01.txt,6252,41,30,6148,104,0,1.61,NOT FOUND,no match,0,success
+disruptive_mood_dysreg_p01.txt,/home/rif17002/honors_thesis/ABCD_files/disruptive_mood_dysreg_p01.txt,33516,22,11,653,0,32863,98.05,NOT FOUND,no match,0,success
+disruptive_mood_dysreg01.txt,/home/rif17002/honors_thesis/ABCD_files/disruptive_mood_dysreg01.txt,33516,22,11,175,0,33341,99.48,NOT FOUND,no match,0,success
+depressive_disorders01.txt,/home/rif17002/honors_thesis/ABCD_files/depressive_disorders01.txt,33516,102,91,1,20131,13384,92.87,NOT FOUND,no match,0,success
+pdem02.txt,/home/rif17002/honors_thesis/ABCD_files/pdem02.txt,11877,135,124,1,11876,0,33.79,NOT FOUND,no match,0,success
+depressive_disorders_p01.txt,/home/rif17002/honors_thesis/ABCD_files/depressive_disorders_p01.txt,33516,102,91,1,19978,13537,93.26,NOT FOUND,no match,0,success
+abcd_cbcls01.txt,/home/rif17002/honors_thesis/ABCD_files/abcd_cbcls01.txt,39767,92,81,1,37293,2473,30.52,NOT FOUND,no match,0,success
+abcd_cbcl01.txt,/home/rif17002/honors_thesis/ABCD_files/abcd_cbcl01.txt,39767,132,121,1,39766,0,1.24,NOT FOUND,no match,0,success
