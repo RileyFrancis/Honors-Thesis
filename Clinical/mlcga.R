@@ -95,7 +95,7 @@ timepoints_to_include <- c("baseline_year_1_arm_1",
                            "4_year_follow_up_y_arm_1")
 
 # Number of classes to test
-n_classes_to_test <- 3:6
+n_classes_to_test <- 3:5
 
 # Missingness handling strategy
 # "complete_case" = only subjects with complete data on ALL outcomes at ALL timepoints
