@@ -69,23 +69,23 @@ Three irritability trajectory classes were identified:
 | 3 | Low-Increasing | Low initial irritability that increases over time |
 
 ### Trajectories
-![Irritability Trajectories](lcga_output/lcga_trajectories.png)
+![Irritability Trajectories](lcga_output/figures/lcga_trajectories.png)
 
 ### Model Selection (BIC)
-![BIC Plot](lcga_output/lcga_bic_plot.png)
+![BIC Plot](lcga_output/figures/lcga_bic_plot.png)
 
 ### Class Sizes
-![Class Sizes](lcga_output/lcga_class_sizes.png)
+![Class Sizes](lcga_output/figures/lcga_class_sizes.png)
 
 ---
 
 ## Results
 
 ### Clinical Characterization
-![Clinical Plots](lcga_output/characterization_cbcl_plots.png)
+![Clinical Plots](lcga_output/figures/characterization_cbcl_plots.png)
 
 ### Demographic Characterization
-![Demographic Plots](lcga_output/characterization_demo_plots.png)
+![Demographic Plots](lcga_output/figures/characterization_demo_plots.png)
 
 ---
 

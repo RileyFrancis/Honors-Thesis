@@ -46,6 +46,10 @@ cbcl_dir <- "/home/rif17002/honors_thesis/ABCD_CBCL/Release_5.0"
 # Additional data files (optional) - other variables you want to include
 # Each element should be a list with 'file' path and 'vars' to extract
 additional_files <- list(
+  # Variables to look at:
+  # ksads_3_226_p, ksads_15_433_p, ksads_15_432_p, ksads_15_91_p, ksads_1_3_p
+  # Try with and without 227 228 229 DMDD.
+
   # ODD
   # list(
   #   file = "/home/rif17002/honors_thesis/ABCD_files/opp_defiant_disorder_p01.txt",
