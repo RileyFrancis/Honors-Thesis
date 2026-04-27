@@ -5,3 +5,4 @@ mlcga_results/logs/
 *.RData
 *.err
 *.out
+Rplots.pdf

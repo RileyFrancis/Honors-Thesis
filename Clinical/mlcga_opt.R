@@ -179,16 +179,8 @@ load_cbcl_long <- function(cbcl_dir, timepoints, cbcl_vars) {
   all_data <- list()
   
   cat("\nLoading", length(timepoints), "CBCL long format files...\n")
-  pb <- progress_bar$new(
-    format = "  [:bar] :percent | :current/:total files | eta: :eta",
-    total = length(timepoints),
-    clear = FALSE,
-    width = 60
-  )
   
   for (tp in timepoints) {
-    pb$tick()
-    
     file_suffix <- timepoint_files[tp]
     if (is.na(file_suffix)) {
       warning("No file mapping for timepoint: ", tp)
@@ -219,6 +211,7 @@ load_cbcl_long <- function(cbcl_dir, timepoints, cbcl_vars) {
         cols_to_keep <- c("subjectkey", "eventname", "time_months", available_vars)
         df <- df[, ..cols_to_keep]
         all_data[[tp]] <- df
+        cat("  Loaded", tp, ":", nrow(df), "rows\n")
       }
     }
   }
@@ -254,16 +247,8 @@ load_cbcl_wide <- function(cbcl_dir, timepoints, cbcl_vars) {
   all_data <- list()
   
   cat("\nLoading", length(timepoints), "CBCL wide format files...\n")
-  pb <- progress_bar$new(
-    format = "  [:bar] :percent | :current/:total files | eta: :eta",
-    total = length(timepoints),
-    clear = FALSE,
-    width = 60
-  )
   
   for (tp in timepoints) {
-    pb$tick()
-    
     file_suffix <- timepoint_files[tp]
     file_path <- file.path(cbcl_dir, 
                            paste0("abcd_cbcl_irr_index_release5.0_", 
@@ -397,7 +382,6 @@ load_additional_file <- function(file_info, timepoints) {
 # ============================================================================
 
 get_cache_key <- function(...) {
-  # Create unique cache key from parameters
   digest(list(...), algo = "md5")
 }
 
@@ -440,27 +424,10 @@ load_from_cache <- function(cache_name, params = NULL) {
 }
 
 # ============================================================================
-# PROGRESS BAR
-# ============================================================================
-
-create_model_progress_bar <- function(total_classes, stage = "fitting") {
-  pb <- progress_bar$new(
-    format = paste0("  ", stage, " [:bar] :percent | :current/:total | ",
-                   "elapsed: :elapsed | eta: :eta | :model_info"),
-    total = total_classes,
-    clear = FALSE,
-    width = 80,
-    complete = "█",
-    incomplete = "░"
-  )
-  return(pb)
-}
-
-# ============================================================================
 # OPTIMIZED MODEL FITTING WITH GRID SEARCH
 # ============================================================================
 
-# Grid search for fast initial values (NEW!)
+# Grid search for fast initial values
 grid_search_initial_values <- function(data_analysis, formula_str, ng, n_starts = 3) {
   cat("  Running grid search for initial values (", n_starts, "starts)...\n")
   
@@ -468,7 +435,6 @@ grid_search_initial_values <- function(data_analysis, formula_str, ng, n_starts 
   best_model <- NULL
   
   for (i in 1:n_starts) {
-    # Use gridsearch with limited maxiter for speed
     model <- tryCatch({
       multlcmm(
         fixed = as.formula(formula_str),
@@ -477,7 +443,7 @@ grid_search_initial_values <- function(data_analysis, formula_str, ng, n_starts 
         ng = ng,
         data = as.data.frame(data_analysis),
         verbose = FALSE,
-        maxiter = 25,  # Very short for grid search
+        maxiter = 25,
         convB = convergence_tolerance,
         convL = convergence_tolerance,
         convG = convergence_tolerance
@@ -493,10 +459,9 @@ grid_search_initial_values <- function(data_analysis, formula_str, ng, n_starts 
   return(best_model)
 }
 
-# Fast adaptive fitting
+# Fast adaptive fitting (FIXED - removed problematic progress callback)
 fit_model_adaptive <- function(formula_str, data_analysis, ng, B_model = NULL, 
-                              max_iter_sequence = NULL,
-                              progress_callback = NULL) {
+                              max_iter_sequence = NULL) {
   
   if (is.null(max_iter_sequence)) {
     max_iter_sequence <- c(max_iterations_initial, max_iterations_final)
@@ -506,10 +471,6 @@ fit_model_adaptive <- function(formula_str, data_analysis, ng, B_model = NULL,
   
   for (iter_idx in seq_along(max_iter_sequence)) {
     max_iter <- max_iter_sequence[iter_idx]
-    
-    if (!is.null(progress_callback)) {
-      progress_callback(paste0("iter:", max_iter))
-    }
     
     tryCatch({
       if (is.null(B_model)) {
@@ -565,16 +526,12 @@ fit_model_adaptive <- function(formula_str, data_analysis, ng, B_model = NULL,
       }
       
       if (model$conv == 1 || model$conv == 2) {
-        if (!is.null(progress_callback)) {
-          progress_callback(paste0("✓ conv:", model$conv))
-        }
+        cat("    Converged (conv:", model$conv, ")\n")
         return(model)
       }
       
     }, error = function(e) {
-      if (!is.null(progress_callback)) {
-        progress_callback(paste0("ERROR"))
-      }
+      cat("    Error:", e$message, "\n")
     })
   }
   
@@ -651,24 +608,13 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
   } else {
     cat("Fitting new 1-class model...\n")
     
-    pb_1class <- progress_bar$new(
-      format = "  Initializing [:bar] :model_info",
-      total = 1,
-      clear = FALSE,
-      width = 70
-    )
-    
+    # FIXED: Removed the problematic progress bar
     model_1class <- fit_model_adaptive(
       formula_str = formula_str,
       data_analysis = data_analysis,
       ng = 1,
-      B_model = NULL,
-      progress_callback = function(info) {
-        pb_1class$tick(tokens = list(model_info = info))
-      }
+      B_model = NULL
     )
-    
-    pb_1class$terminate()
     
     if (is.null(model_1class)) {
       stop("Failed to fit 1-class model")
@@ -697,7 +643,7 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
     B_values <- model_1class$best
     clusterExport(cl, "B_values", envir = environment())
     
-    pb_parallel <- create_model_progress_bar(length(n_classes_vec), "Parallel")
+    cat("Fitting models in parallel...\n")
     
     results_list <- foreach(n_class = n_classes_vec, 
                             .packages = c("lcmm", "dplyr"),
@@ -767,13 +713,8 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
       ))
       
       status <- ifelse(result$converged, "✓", "✗")
-      pb_parallel$tick(tokens = list(
-        model_info = paste0(n_class, "-class ", status, 
-                           " BIC:", round(result$BIC, 0))
-      ))
+      cat("  ", n_class, "-class:", status, "BIC:", round(result$BIC, 0), "\n")
     }
-    
-    pb_parallel$terminate()
     
   } else {
     # Sequential fitting
@@ -781,11 +722,11 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
     cat("SEQUENTIAL MODEL FITTING\n")
     cat("========================================\n\n")
     
-    pb <- create_model_progress_bar(length(n_classes_vec), "Sequential")
-    
     for (idx in seq_along(n_classes_vec)) {
       n_class <- n_classes_vec[idx]
       model_name <- paste0("mlcga_", n_class, "class")
+      
+      cat("Fitting", n_class, "-class model...\n")
       
       # Try to load from cache
       model_cache_params <- list(
@@ -799,18 +740,13 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
       model <- load_from_cache(model_name, model_cache_params)
       
       if (!is.null(model)) {
-        cat("  ✓ Loaded", n_class, "-class model from cache\n")
+        cat("  ✓ Loaded from cache\n")
       } else {
         model <- fit_model_adaptive(
           formula_str = formula_str,
           data_analysis = data_analysis,
           ng = n_class,
-          B_model = model_1class,
-          progress_callback = function(info) {
-            pb$tick(tokens = list(
-              model_info = paste0(n_class, "-class ", info)
-            ))
-          }
+          B_model = model_1class
         )
         
         if (!is.null(model)) {
@@ -833,9 +769,7 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
           n_outcomes = length(outcome_vars)
         ))
         
-        pb$tick(tokens = list(
-          model_info = paste0(n_class, "-class ✓ BIC:", round(model$BIC, 0))
-        ))
+        cat("  ✓ BIC:", round(model$BIC, 0), "\n")
       } else {
         fit_stats <- rbind(fit_stats, data.frame(
           n_classes = n_class,
@@ -846,13 +780,11 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
           n_outcomes = length(outcome_vars)
         ))
         
-        pb$tick(tokens = list(model_info = paste0(n_class, "-class ✗")))
+        cat("  ✗ Failed to converge\n")
       }
       
       gc(verbose = FALSE)
     }
-    
-    pb$terminate()
   }
   
   cat("\nMemory after fitting:", format(mem_used(), units = "MB"), "\n")
@@ -1063,7 +995,7 @@ if (!is.null(model)) {
   
   plot_file <- file.path(output_dir, 
                          paste0("mean_trajectories_mlcga_", n_class, "class.png"))
-  ggsave(plot_file, plot = p, width = 12, height = 8, dpi = 150)  # Lower DPI for speed
+  ggsave(plot_file, plot = p, width = 12, height = 8, dpi = 150)
   
   cat("✓ Step 7 complete\n")
 }
