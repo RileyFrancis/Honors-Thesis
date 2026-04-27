@@ -1,5 +1,5 @@
 # Multivariate Latent Class Growth Analysis (MLCGA) Script for ABCD Data
-# OPTIMIZED VERSION with parallel processing and performance improvements
+# CORRECTED & OPTIMIZED VERSION with parallel processing and tqdm-style progress bars
 # TRUE multivariate analysis - considers all variables simultaneously
 # Handles ABCD-specific time variables and CBCL irritability data
 
@@ -121,7 +121,7 @@ options(warn = 1)  # Print warnings as they occur
 
 # Log session info at start
 cat("============================================\n")
-cat("MLCGA ANALYSIS LOG (OPTIMIZED VERSION)\n")
+cat("MLCGA ANALYSIS LOG (CORRECTED VERSION)\n")
 cat("Started:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
 cat("============================================\n\n")
 cat("R Version:\n")
@@ -140,9 +140,10 @@ cat("Initial memory usage:", format(mem_used(), units = "MB"), "\n\n")
 # HELPER FUNCTIONS
 # ============================================================================
 
-# Convert ABCD eventname to numeric months
+# Convert ABCD eventname to numeric months (FIXED)
 convert_eventname_to_months <- function(eventname) {
-  months <- case_when(
+  # Use dplyr::case_when with proper syntax
+  months <- dplyr::case_when(
     grepl("baseline_year_1_arm_1", eventname) ~ 0,
     grepl("6_month_follow_up_y_arm_1", eventname) ~ 6,
     grepl("1_year_follow_up_y_arm_1", eventname) ~ 12,
@@ -226,7 +227,8 @@ load_cbcl_long <- function(cbcl_dir, timepoints, cbcl_vars) {
           cat(" ✓ (", nrow(df), "rows,", length(available_vars), "vars)\n")
         } else {
           cat(" ✗ (no CBCL variables found)\n")
-          warning("  No CBCL variables found in ", file_path)
+          warning("  Expected vars: ", paste(cbcl_vars, collapse = ", "), 
+                  "\n  Available vars: ", paste(head(names(df), 20), collapse = ", "))
         }
       }
     } else {
@@ -248,7 +250,7 @@ load_cbcl_long <- function(cbcl_dir, timepoints, cbcl_vars) {
   }
 }
 
-# Load and process CBCL wide format files (NEW FUNCTION)
+# Load and process CBCL wide format files (FIXED)
 load_cbcl_wide <- function(cbcl_dir, timepoints, cbcl_vars) {
   # Map timepoints to file suffixes and months
   timepoint_files <- c(
@@ -294,13 +296,20 @@ load_cbcl_wide <- function(cbcl_dir, timepoints, cbcl_vars) {
     if (file.exists(file_path)) {
       cat("  Loading:", basename(file_path), "...")
       
-      # Use fread for faster reading
+      # Use fread for faster reading with error handling
       df <- tryCatch({
         fread(file_path, showProgress = FALSE)
       }, error = function(e) {
         cat("  fread failed, trying read_csv...\n")
-        read_csv(file_path, show_col_types = FALSE)
+        tryCatch({
+          read_csv(file_path, show_col_types = FALSE)
+        }, error = function(e2) {
+          cat("  ERROR: Could not read file\n")
+          return(NULL)
+        })
       })
+      
+      if (is.null(df)) next
       
       # Check for required columns
       if ("subjectkey" %in% names(df) || "src_subject_id" %in% names(df)) {
@@ -328,7 +337,8 @@ load_cbcl_wide <- function(cbcl_dir, timepoints, cbcl_vars) {
           cat(" ✓ (", nrow(df), "subjects,", length(available_vars), "vars)\n")
         } else {
           cat(" ✗ (no CBCL variables found)\n")
-          warning("  No CBCL variables found in ", file_path)
+          warning("  Expected vars: ", paste(cbcl_vars, collapse = ", "),
+                  "\n  Available vars: ", paste(head(names(df), 20), collapse = ", "))
         }
       }
     } else {
@@ -347,7 +357,7 @@ load_cbcl_wide <- function(cbcl_dir, timepoints, cbcl_vars) {
     
     cat("Combined CBCL data (wide):", nrow(combined), "subjects x", ncol(combined), "columns\n")
     
-    # NOW convert from wide to long format for analysis
+    # NOW convert from wide to long format for analysis (FIXED)
     cat("Converting wide format to long format for analysis...\n")
     
     # Identify all variable-time combinations
@@ -360,25 +370,29 @@ load_cbcl_wide <- function(cbcl_dir, timepoints, cbcl_vars) {
                           variable.name = "var_time",
                           value.name = "value")
     
-    # Split var_time into variable and time
-    combined_long[, c("variable", "time_months") := tstrsplit(var_time, "_t", fixed = TRUE)]
-    combined_long[, time_months := as.numeric(time_months)]
+    # Split var_time into variable and time (FIXED: proper data.table syntax)
+    combined_long[, variable := sub("_t[0-9]+$", "", var_time)]
+    combined_long[, time_months := as.numeric(sub(".*_t", "", var_time))]
     combined_long[, var_time := NULL]
     
-    # Convert eventname from time_months
-    combined_long[, eventname := case_when(
-      time_months == 0 ~ "baseline_year_1_arm_1",
-      time_months == 12 ~ "1_year_follow_up_y_arm_1",
-      time_months == 24 ~ "2_year_follow_up_y_arm_1",
-      time_months == 36 ~ "3_year_follow_up_y_arm_1",
-      time_months == 48 ~ "4_year_follow_up_y_arm_1",
-      TRUE ~ NA_character_
-    )]
+    # Convert eventname from time_months (FIXED: use proper data.table assignment)
+    combined_long[, eventname := fifelse(
+      time_months == 0, "baseline_year_1_arm_1",
+      fifelse(time_months == 12, "1_year_follow_up_y_arm_1",
+      fifelse(time_months == 24, "2_year_follow_up_y_arm_1",
+      fifelse(time_months == 36, "3_year_follow_up_y_arm_1",
+      fifelse(time_months == 48, "4_year_follow_up_y_arm_1",
+      NA_character_)))))]
     
-    # Pivot wider to get one column per variable
-    combined_long <- dcast(combined_long, 
-                           subjectkey + eventname + time_months ~ variable,
-                           value.var = "value")
+    # Pivot wider to get one column per variable with error handling
+    combined_long <- tryCatch({
+      dcast(combined_long, 
+            subjectkey + eventname + time_months ~ variable,
+            value.var = "value")
+    }, error = function(e) {
+      stop("Error in dcast: ", e$message, 
+           "\nCheck that variable names don't have unexpected format")
+    })
     
     cat("Converted to long format:", nrow(combined_long), "rows x", ncol(combined_long), "columns\n")
     cat("Unique subjects:", uniqueN(combined_long$subjectkey), "\n")
@@ -389,7 +403,7 @@ load_cbcl_wide <- function(cbcl_dir, timepoints, cbcl_vars) {
   }
 }
 
-# Load additional variable files (OPTIMIZED)
+# Load additional variable files (OPTIMIZED with better error messages)
 load_additional_file <- function(file_info, timepoints) {
   file_path <- file_info$file
   vars_to_extract <- file_info$vars
@@ -411,9 +425,19 @@ load_additional_file <- function(file_info, timepoints) {
       read_tsv(file_path, show_col_types = FALSE, guess_max = 10000)
     }, error = function(e2) {
       cat("  TSV read failed, trying CSV...\n")
-      read_csv(file_path, show_col_types = FALSE, guess_max = 10000)
+      tryCatch({
+        read_csv(file_path, show_col_types = FALSE, guess_max = 10000)
+      }, error = function(e3) {
+        cat("  All read attempts failed\n")
+        return(NULL)
+      })
     })
   })
+  
+  if (is.null(df)) {
+    warning("Could not read file: ", file_path)
+    return(NULL)
+  }
   
   # Convert to data.table if not already
   if (!is.data.table(df)) {
@@ -433,18 +457,26 @@ load_additional_file <- function(file_info, timepoints) {
     # Print ALL column names to help debug
     cat("  ERROR: No subject ID column found!\n")
     cat("  All columns:", paste(names(df), collapse = ", "), "\n")
-    warning("No subject ID column found in ", file_path)
+    warning("No subject ID column (subjectkey or src_subject_id) found in ", file_path)
     return(NULL)
   }
   
   # Check for time variable
   if (!time_var %in% names(df)) {
+    cat("  ERROR: Time variable '", time_var, "' not found!\n")
+    cat("  Available columns:", paste(names(df), collapse = ", "), "\n")
     warning("Time variable '", time_var, "' not found in ", file_path)
     return(NULL)
   }
   
   # Filter to relevant timepoints
   df <- df[get(time_var) %in% timepoints]
+  
+  if (nrow(df) == 0) {
+    warning("No rows match the specified timepoints in ", file_path)
+    return(NULL)
+  }
+  
   df[, eventname := get(time_var)]
   df[, time_months := convert_eventname_to_months(get(time_var))]
   
@@ -452,8 +484,16 @@ load_additional_file <- function(file_info, timepoints) {
   available_vars <- intersect(vars_to_extract, names(df))
   
   if (length(available_vars) == 0) {
+    cat("  ERROR: None of requested variables found!\n")
+    cat("  Requested:", paste(vars_to_extract, collapse = ", "), "\n")
+    cat("  Available:", paste(head(names(df), 20), collapse = ", "), "\n")
     warning("None of the requested variables found in ", file_path)
     return(NULL)
+  }
+  
+  if (length(available_vars) < length(vars_to_extract)) {
+    missing_vars <- setdiff(vars_to_extract, available_vars)
+    cat("  WARNING: Some variables not found:", paste(missing_vars, collapse = ", "), "\n")
   }
   
   cols_to_keep <- c("subjectkey", "eventname", "time_months", available_vars)
@@ -462,6 +502,93 @@ load_additional_file <- function(file_info, timepoints) {
   cat("  Loaded", nrow(df), "rows with variables:", paste(available_vars, collapse = ", "), "\n")
   
   return(df)
+}
+
+# ============================================================================
+# TQDM-STYLE PROGRESS BAR FOR MODEL FITTING
+# ============================================================================
+
+create_model_progress_bar <- function(total_classes, stage = "fitting") {
+  # Create a custom progress bar similar to tqdm
+  pb <- progress_bar$new(
+    format = paste0("  ", stage, " [:bar] :percent | :current/:total models | ",
+                   "elapsed: :elapsed | eta: :eta | :model_info"),
+    total = total_classes,
+    clear = FALSE,
+    width = 80,
+    complete = "█",
+    incomplete = "░"
+  )
+  return(pb)
+}
+
+# Enhanced model fitting with tqdm-style progress
+fit_model_adaptive <- function(formula_str, data_analysis, ng, B_model = NULL, 
+                              max_iter_sequence = c(100, 250, 500),
+                              progress_callback = NULL) {
+  
+  fixed_formula <- as.formula(formula_str)
+  
+  for (iter_idx in seq_along(max_iter_sequence)) {
+    max_iter <- max_iter_sequence[iter_idx]
+    
+    # Update progress if callback provided
+    if (!is.null(progress_callback)) {
+      progress_callback(paste0("iter:", max_iter))
+    }
+    
+    tryCatch({
+      if (is.null(B_model)) {
+        # First model (1-class)
+        model <- multlcmm(
+          fixed = fixed_formula,
+          random = ~ time_months,
+          subject = "subjectkey_numeric",
+          ng = ng,
+          data = as.data.frame(data_analysis),
+          verbose = FALSE,
+          maxiter = max_iter
+        )
+      } else {
+        # Multi-class models with initial values
+        model <- multlcmm(
+          fixed = fixed_formula,
+          mixture = ~ time_months,
+          random = ~ time_months,
+          subject = "subjectkey_numeric",
+          ng = ng,
+          data = as.data.frame(data_analysis),
+          B = B_model,
+          verbose = FALSE,
+          maxiter = max_iter
+        )
+      }
+      
+      if (model$conv == 1 || model$conv == 2) {
+        if (!is.null(progress_callback)) {
+          progress_callback(paste0("✓ conv:", model$conv))
+        }
+        return(model)
+      } else {
+        if (iter_idx < length(max_iter_sequence)) {
+          if (!is.null(progress_callback)) {
+            progress_callback(paste0("retry +", max_iter_sequence[iter_idx + 1] - max_iter, "iter"))
+          }
+        }
+      }
+      
+    }, error = function(e) {
+      if (!is.null(progress_callback)) {
+        progress_callback(paste0("ERROR: ", substr(e$message, 1, 30)))
+      }
+      if (iter_idx == length(max_iter_sequence)) {
+        return(NULL)
+      }
+    })
+  }
+  
+  warning("Model did not converge even with maximum iterations")
+  return(model)  # Return last attempt even if not converged
 }
 
 # ============================================================================
@@ -603,61 +730,8 @@ missing_summary <- merged_data[, lapply(.SD, function(x) sum(is.na(x)))] %>%
 print(missing_summary)
 
 # ============================================================================
-# MODEL FITTING FUNCTIONS (OPTIMIZED)
+# MODEL FITTING FUNCTIONS (OPTIMIZED WITH TQDM-STYLE PROGRESS)
 # ============================================================================
-
-# Adaptive iteration function
-fit_model_adaptive <- function(formula_str, data_analysis, ng, B_model = NULL, 
-                              max_iter_sequence = c(100, 250, 500)) {
-  
-  fixed_formula <- as.formula(formula_str)
-  
-  for (max_iter in max_iter_sequence) {
-    tryCatch({
-      if (is.null(B_model)) {
-        # First model (1-class)
-        model <- multlcmm(
-          fixed = fixed_formula,
-          random = ~ time_months,
-          subject = "subjectkey_numeric",
-          ng = ng,
-          data = as.data.frame(data_analysis),
-          verbose = FALSE,
-          maxiter = max_iter
-        )
-      } else {
-        # Multi-class models with initial values
-        model <- multlcmm(
-          fixed = fixed_formula,
-          mixture = ~ time_months,
-          random = ~ time_months,
-          subject = "subjectkey_numeric",
-          ng = ng,
-          data = as.data.frame(data_analysis),
-          B = B_model,
-          verbose = FALSE,
-          maxiter = max_iter
-        )
-      }
-      
-      if (model$conv == 1 || model$conv == 2) {
-        cat("  Converged with", max_iter, "iterations (conv code:", model$conv, ")\n")
-        return(model)
-      } else {
-        cat("  Did not converge with", max_iter, "iterations, trying more...\n")
-      }
-      
-    }, error = function(e) {
-      cat("  Error with", max_iter, "iterations:", e$message, "\n")
-      if (max_iter == max(max_iter_sequence)) {
-        return(NULL)
-      }
-    })
-  }
-  
-  warning("Model did not converge even with maximum iterations")
-  return(model)  # Return last attempt even if not converged
-}
 
 fit_mlcga_models <- function(data, outcome_vars, n_classes_vec, 
                              missingness_strategy = "complete_case",
@@ -691,6 +765,14 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
     stop("Too few observations with data. Consider changing missingness strategy or checking data.")
   }
   
+  # Validation: Check sample size per class (rough estimate)
+  min_sample_per_class <- nrow(data_analysis) / max(n_classes_vec) / 10
+  if (min_sample_per_class < 20) {
+    warning("Small sample size may lead to unstable estimates. ",
+            "Estimated min subjects per class: ", round(min_sample_per_class), 
+            ". Consider reducing number of classes.")
+  }
+  
   # Check if data is in correct format for multlcmm
   subjects_per_row <- data_analysis[, .(n_rows = .N), by = subjectkey]
   
@@ -703,13 +785,16 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
   }
   
   # First, fit a 1-class model to get initial values
-  cat("\nFitting 1-class multivariate model (for initial values)...\n")
+  cat("\n========================================\n")
+  cat("Fitting 1-class multivariate model\n")
+  cat("(for initial values)\n")
+  cat("========================================\n")
   cat("Time started:", format(Sys.time(), "%H:%M:%S"), "\n")
   
   # Build the formula for multlcmm
   # Format: outcome1 + outcome2 + outcome3 ~ time_months
   formula_str <- paste(paste(outcome_vars, collapse = " + "), "~ time_months")
-  cat("  Formula:", formula_str, "\n")
+  cat("  Formula:", formula_str, "\n\n")
   
   # Cache file for 1-class model
   cache_file <- file.path(output_dir, "cache_model_1class.RData")
@@ -717,14 +802,32 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
   if (file.exists(cache_file)) {
     cat("  Loading cached 1-class model...\n")
     load(cache_file)
+    cat("  ✓ Loaded from cache\n")
   } else {
+    cat("  Fitting 1-class model...\n")
+    
+    # Create progress indicator for 1-class model
+    pb_1class <- progress_bar$new(
+      format = "  Initializing [:bar] :model_info",
+      total = 1,
+      clear = FALSE,
+      width = 70,
+      complete = "█",
+      incomplete = "░"
+    )
+    
     model_1class <- fit_model_adaptive(
       formula_str = formula_str,
       data_analysis = data_analysis,
       ng = 1,
       B_model = NULL,
-      max_iter_sequence = c(max_iterations_initial, max_iterations_final)
+      max_iter_sequence = c(max_iterations_initial, max_iterations_final),
+      progress_callback = function(info) {
+        pb_1class$tick(tokens = list(model_info = info))
+      }
     )
+    
+    pb_1class$terminate()
     
     if (is.null(model_1class)) {
       stop("Failed to fit 1-class model")
@@ -732,11 +835,10 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
     
     # Save for future use
     save(model_1class, file = cache_file)
-    cat("  Cached 1-class model saved\n")
+    cat("  ✓ Cached 1-class model saved\n")
   }
   
-  cat("  1-class model converged successfully\n")
-  cat("  LogLik:", model_1class$loglik, "\n")
+  cat("  LogLik:", round(model_1class$loglik, 2), "\n")
   cat("  Time completed:", format(Sys.time(), "%H:%M:%S"), "\n")
   
   # Now fit multi-class models
@@ -745,31 +847,50 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
     cat("PARALLEL MODEL FITTING\n")
     cat("========================================\n")
     cat("Using", n_cores, "cores\n")
+    cat("Fitting", length(n_classes_vec), "models in parallel...\n\n")
     
     # Setup parallel backend
     cl <- makeCluster(n_cores)
     registerDoParallel(cl)
     
-    # Export necessary objects to cluster
-    clusterExport(cl, c("formula_str", "data_analysis", "model_1class", 
-                        "fit_model_adaptive", "max_iterations_initial", 
+    # Export necessary objects to cluster (FIXED: reduced memory footprint)
+    clusterExport(cl, c("formula_str", "data_analysis", "max_iterations_initial", 
                         "max_iterations_final"),
                   envir = environment())
     
-    # Fit models in parallel
-    cat("Fitting", length(n_classes_vec), "models in parallel...\n")
+    # Export model B values (parameters only, not full object)
+    B_values <- model_1class$best
+    clusterExport(cl, "B_values", envir = environment())
     
+    # Create progress bar for parallel execution
+    pb_parallel <- create_model_progress_bar(length(n_classes_vec), "Parallel")
+    
+    # Fit models in parallel
     results_list <- foreach(n_class = n_classes_vec, 
                             .packages = c("lcmm", "dplyr"),
-                            .errorhandling = "pass") %dopar% {
+                            .errorhandling = "pass",
+                            .combine = 'list',
+                            .multicombine = TRUE) %dopar% {
       
-      model <- fit_model_adaptive(
-        formula_str = formula_str,
-        data_analysis = data_analysis,
-        ng = n_class,
-        B_model = model_1class,
-        max_iter_sequence = c(max_iterations_initial, max_iterations_final)
-      )
+      # Reconstruct B_model from parameters
+      B_model <- model_1class
+      B_model$best <- B_values
+      
+      model <- tryCatch({
+        multlcmm(
+          fixed = as.formula(formula_str),
+          mixture = ~ time_months,
+          random = ~ time_months,
+          subject = "subjectkey_numeric",
+          ng = n_class,
+          data = as.data.frame(data_analysis),
+          B = B_model,
+          verbose = FALSE,
+          maxiter = max_iterations_final
+        )
+      }, error = function(e) {
+        NULL
+      })
       
       if (!is.null(model)) {
         list(
@@ -797,8 +918,9 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
     # Stop cluster
     stopCluster(cl)
     
-    # Process results
-    for (result in results_list) {
+    # Process results with progress updates
+    for (i in seq_along(results_list)) {
+      result <- results_list[[i]]
       n_class <- result$n_classes
       model_name <- paste0("mlcga_", n_class, "class")
       
@@ -818,33 +940,25 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
         n_outcomes = length(outcome_vars)
       ))
       
-      cat("\nClass", n_class, "results:\n")
-      cat("  AIC:", round(result$AIC, 2), "\n")
-      cat("  BIC:", round(result$BIC, 2), "\n")
-      cat("  Converged:", result$converged, "\n")
+      # Update progress bar
+      status <- ifelse(result$converged, "✓", "✗")
+      pb_parallel$tick(tokens = list(
+        model_info = paste0(n_class, "-class ", status, " BIC:", round(result$BIC, 0))
+      ))
     }
     
+    pb_parallel$terminate()
+    
   } else {
-    # Sequential fitting with progress bar
+    # Sequential fitting with enhanced tqdm-style progress bar
     cat("\n========================================\n")
     cat("SEQUENTIAL MODEL FITTING\n")
-    cat("========================================\n")
+    cat("========================================\n\n")
     
-    pb <- progress_bar$new(
-      format = "  [:bar] :percent eta: :eta",
-      total = length(n_classes_vec),
-      clear = FALSE,
-      width = 60
-    )
+    pb <- create_model_progress_bar(length(n_classes_vec), "Sequential")
     
-    for (n_class in n_classes_vec) {
-      pb$tick()
-      
-      cat("\n========================================\n")
-      cat("Fitting", n_class, "class multivariate model...\n")
-      cat("Time started:", format(Sys.time(), "%H:%M:%S"), "\n")
-      cat("========================================\n")
-      
+    for (idx in seq_along(n_classes_vec)) {
+      n_class <- n_classes_vec[idx]
       model_name <- paste0("mlcga_", n_class, "class")
       
       model <- fit_model_adaptive(
@@ -852,7 +966,12 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
         data_analysis = data_analysis,
         ng = n_class,
         B_model = model_1class,
-        max_iter_sequence = c(max_iterations_initial, max_iterations_final)
+        max_iter_sequence = c(max_iterations_initial, max_iterations_final),
+        progress_callback = function(info) {
+          pb$tick(tokens = list(
+            model_info = paste0(n_class, "-class ", info)
+          ))
+        }
       )
       
       if (!is.null(model)) {
@@ -870,10 +989,11 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
           n_outcomes = length(outcome_vars)
         ))
         
-        cat("  AIC:", round(model$AIC, 2), "\n")
-        cat("  BIC:", round(model$BIC, 2), "\n")
-        cat("  Converged:", (model$conv == 1 || model$conv == 2), "\n")
-        cat("  N iterations:", model$niter, "\n")
+        # Final tick with results
+        pb$tick(tokens = list(
+          model_info = paste0(n_class, "-class ✓ AIC:", round(model$AIC, 0), 
+                            " BIC:", round(model$BIC, 0))
+        ))
       } else {
         fit_stats <- rbind(fit_stats, data.frame(
           n_classes = n_class,
@@ -886,16 +1006,21 @@ fit_mlcga_models <- function(data, outcome_vars, n_classes_vec,
           n_subjects = uniqueN(data_analysis$subjectkey),
           n_outcomes = length(outcome_vars)
         ))
+        
+        pb$tick(tokens = list(
+          model_info = paste0(n_class, "-class ✗ FAILED")
+        ))
       }
       
-      cat("  Time completed:", format(Sys.time(), "%H:%M:%S"), "\n")
-      
       # Garbage collection after each model
-      gc()
+      gc(verbose = FALSE)
     }
+    
+    pb$terminate()
   }
   
-  cat("\nMemory after model fitting:", format(mem_used(), units = "MB"), "\n")
+  cat("\n")
+  cat("Memory after model fitting:", format(mem_used(), units = "MB"), "\n")
   
   return(list(
     models = models, 
@@ -966,6 +1091,9 @@ if (nrow(best_model_row) == 0) {
   stop("No models converged successfully. Check your data and model specification.")
 }
 
+# FIXED: Extract n_class BEFORE using it
+n_class <- best_model_row$n_classes
+
 cat("\n\nBEST FITTING MODEL (by BIC):\n")
 print(best_model_row)
 
@@ -977,7 +1105,6 @@ cat("\n✓ Step 6 complete: Best model selected (", n_class, "classes)\n")
 
 cat("\n[Step 7/8] Generating visualizations...\n")
 
-n_class <- best_model_row$n_classes
 model_name <- paste0("mlcga_", n_class, "class")
 model <- results$models[[model_name]]
 
@@ -1115,6 +1242,8 @@ if (!is.null(model)) {
                                paste0("trajectories_", outcome, "_mlcga_", n_class, "class.png"))
     ggsave(plot_file_ind, plot = p_ind, width = 10, height = 6, dpi = 300)
   }
+  
+  pb_plots$terminate()
   
   cat("\n✓ All", length(results$outcome_vars), "individual plots created\n")
   
