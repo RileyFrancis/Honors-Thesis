@@ -1,10 +1,3 @@
-# Irritability Trajectory Analysis — Honors Thesis
-
-**Riley Francis** | University of Connecticut  
-Mentored by **Dr. Jinbo Bi** | With help from **Faith Wariri**
-
----
-
 ## Overview
 
 This project uses Latent Class Growth Analysis (LCGA) to identify distinct irritability trajectory classes in children from the **Adolescent Brain Cognitive Development (ABCD) Study**. After identifying trajectory classes, baseline demographic and clinical variables are compared across classes to characterize who falls into each group.
