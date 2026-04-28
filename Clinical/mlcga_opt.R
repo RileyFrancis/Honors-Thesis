@@ -76,7 +76,7 @@ SPEED_LEVEL <- 1  # Change to 2 or 3 for more thorough analysis
 if (SPEED_LEVEL == 1) {
   # MAXIMUM SPEED (5-10x faster)
   use_parallel <- TRUE
-  n_cores <- detectCores() - 1
+  n_cores <- 8
   max_iterations_initial <- 50      # Reduced from 100
   max_iterations_final <- 200       # Reduced from 500
   n_random_starts <- 3              # Random starts for robustness
@@ -939,7 +939,7 @@ cat("\nBest model:", n_class, "classes (BIC =", round(best_model_row$BIC, 2), ")
 cat("✓ Step 6 complete\n")
 
 # ============================================================================
-# VISUALIZATIONS (SIMPLIFIED FOR SPEED)
+# VISUALIZATIONS (SIMPLIFIED FOR SPEED) - FIXED POSTERIORS JOIN
 # ============================================================================
 
 cat("\n[Step 7/8] Creating plots...\n")
@@ -950,8 +950,15 @@ model <- results$models[[model_name]]
 if (!is.null(model)) {
   posteriors <- model$pprob
   
+  # Check what the ID column is actually named
+  cat("Posterior probability columns:", paste(names(posteriors), collapse = ", "), "\n")
+  
+  # The first column should be the subject ID - find its name
+  id_col_name <- names(posteriors)[1]
+  
   posteriors_with_id <- results$id_mapping %>%
-    left_join(as.data.frame(posteriors), by = c("subjectkey_numeric" = "subject"))
+    left_join(as.data.frame(posteriors), 
+              by = setNames(id_col_name, "subjectkey_numeric"))
   
   posteriors_file <- file.path(output_dir, 
                                 paste0("posteriors_mlcga_", n_class, "class.csv"))
@@ -998,6 +1005,7 @@ if (!is.null(model)) {
   ggsave(plot_file, plot = p, width = 12, height = 8, dpi = 150)
   
   cat("✓ Step 7 complete\n")
+  cat("Plot saved to:", plot_file, "\n")
 }
 
 # ============================================================================
