@@ -1204,17 +1204,22 @@ if (!is.null(model)) {
   
   # Define TIMEFRAMES for x-axis
   TIMEFRAMES <- c(0, 12, 24, 36, 48)
-  
+
   # Fixed color palette (matching LCGA)
-  class_palette <- c(
+  base_palette <- c(
     "1" = "#4f8bc8",   # Class 1 - blue
     "2" = "#8b3fca",   # Class 2 - purple
     "3" = "#cb6587",   # Class 3 - pink
-    "4" = "#f7a258",   # Class 4 - orange (if needed)
-    "5" = "#7dc383"    # Class 5 - green (if needed)
+    "4" = "#f7a258",   # Class 4 - orange
+    "5" = "#7dc383"    # Class 5 - green
   )
-  n_cls <- length(unique(assigned_class))
-  class_palette <- class_palette[as.character(seq_len(n_cls))]
+
+  # Get actual class numbers present in the data
+  actual_classes <- as.character(sort(unique(assigned_class)))
+  cat("Actual classes found in data:", paste(actual_classes, collapse = ", "), "\n")
+
+  # Create palette matching ONLY the classes that exist
+  class_palette <- base_palette[actual_classes]
   
   class_label_lookup <- unique(traj_means[, .(latent_class, class_label)])
   setorder(class_label_lookup, latent_class)
@@ -1271,20 +1276,21 @@ if (!is.null(model)) {
                                    by = latent_class]
   
   p_indiv_all <- ggplot(indiv_sample,
-                        aes(x = time_months, y = composite_score,
-                            group = interaction(subjectkey, latent_class),
-                            color = latent_class)) +
+                      aes(x = time_months, y = composite_score,
+                          group = interaction(subjectkey, latent_class),
+                          color = as.character(latent_class))) +
     geom_line(alpha = 0.04, linewidth = 0.35) +
     geom_line(data = traj_means,
               aes(x = time_months, y = mean_outcome,
-                  group = class_label, color = latent_class),
+                  group = class_label, color = as.character(latent_class)),
               linewidth = 1.6, inherit.aes = FALSE) +
-    scale_color_manual(values = setNames(class_palette, seq_len(length(class_palette))),
-                       name = "Latent Class") +
+    scale_color_manual(values = class_palette,
+                      name = "Latent Class",
+                      labels = actual_classes) +
     scale_x_continuous(breaks = TIMEFRAMES, labels = paste0(TIMEFRAMES, "m")) +
     labs(title    = sprintf("Individual Trajectories — All Classes (%d-Class Solution)", n_class),
-         subtitle = sprintf("Faint lines = individuals (alpha=0.04); bold = class mean | up to %d per class", MAX_INDIV_PER_CLASS),
-         x = "Time (months)", y = "Composite Score") +
+        subtitle = sprintf("Faint lines = individuals (alpha=0.04); bold = class mean | up to %d per class", MAX_INDIV_PER_CLASS),
+        x = "Time (months)", y = "Composite Score") +
     theme_bw(base_size = 12) +
     theme(legend.position = "right")
   
@@ -1346,20 +1352,20 @@ if (!is.null(model)) {
   # Individual trajectories plot (faceted by outcome)
   cat("  Creating faceted individual trajectories...\n")
   p1 <- ggplot(plot_data, 
-               aes(x = time_months, y = value, 
-                   group = subjectkey, color = as.factor(latent_class))) +
-    geom_line(alpha = 0.1) +
-    stat_smooth(aes(group = latent_class), method = "loess", se = TRUE, linewidth = 1.2) +
+             aes(x = time_months, y = value, 
+                 group = subjectkey, color = as.character(latent_class))) +
+    geom_line(alpha = 0.04) +
     facet_wrap(~ outcome, scales = "free_y", ncol = 2) +
     labs(title = paste0("Individual Trajectories by Outcome (MLCGA ", n_class, " classes)"),
-         x = "Time (months)",
-         y = "Value",
-         color = "Class") +
-    scale_color_manual(values = class_palette) +
+        x = "Time (months)",
+        y = "Value",
+        color = "Class") +
+    scale_color_manual(values = class_palette,
+                      labels = actual_classes) +
     theme_minimal() +
     theme(legend.position = "bottom",
           text = element_text(size = 10),
-          strip.text = element_text(size = 11, face = "bold"))
+        strip.text = element_text(size = 11, face = "bold"))
   
   ggsave(file.path(output_dir, 
                    paste0("trajectories_all_outcomes_mlcga_", n_class, "class.png")),
@@ -1373,21 +1379,22 @@ if (!is.null(model)) {
   ), by = .(latent_class, time_months, outcome)]
   
   p2 <- ggplot(mean_trajectories_by_outcome, 
-               aes(x = time_months, y = mean_value, color = as.factor(latent_class))) +
+             aes(x = time_months, y = mean_value, color = as.character(latent_class))) +
     geom_line(linewidth = 1.2) +
     geom_point(size = 2.5) +
     geom_errorbar(aes(ymin = mean_value - se, ymax = mean_value + se), 
                   width = 2, alpha = 0.6) +
     facet_wrap(~ outcome, scales = "free_y", ncol = 2) +
     labs(title = paste0("Mean Trajectories by Outcome (MLCGA ", n_class, " classes)"),
-         x = "Time (months)",
-         y = "Mean Value",
-         color = "Class") +
-    scale_color_manual(values = class_palette) +
+        x = "Time (months)",
+        y = "Mean Value",
+        color = "Class") +
+    scale_color_manual(values = class_palette,
+                      labels = actual_classes) +
     theme_minimal() +
     theme(legend.position = "bottom",
           text = element_text(size = 10),
-          strip.text = element_text(size = 11, face = "bold"))
+        strip.text = element_text(size = 11, face = "bold"))
   
   ggsave(file.path(output_dir, 
                    paste0("mean_trajectories_all_outcomes_mlcga_", n_class, "class.png")),
@@ -1409,18 +1416,19 @@ if (!is.null(model)) {
     outcome_data <- plot_data[outcome == !!outcome]
     
     p_ind <- ggplot(outcome_data, 
-                    aes(x = time_months, y = value, 
-                        group = subjectkey, color = as.factor(latent_class))) +
+                aes(x = time_months, y = value, 
+                    group = subjectkey, color = as.character(latent_class))) +
       geom_line(alpha = 0.2) +
       stat_smooth(aes(group = latent_class), method = "loess", se = TRUE, linewidth = 1.5) +
-      scale_color_manual(values = class_palette) +
+      scale_color_manual(values = class_palette,
+                        labels = actual_classes) +
       labs(title = paste0("Individual Trajectories: ", outcome, " (MLCGA ", n_class, " classes)"),
-           x = "Time (months)",
-           y = outcome,
-           color = "Class") +
+          x = "Time (months)",
+          y = outcome,
+          color = "Class") +
       theme_minimal() +
       theme(legend.position = "bottom",
-            text = element_text(size = 12))
+        text = element_text(size = 12))
     
     plot_file_ind <- file.path(output_dir, 
                                paste0("trajectories_", outcome, "_mlcga_", n_class, "class.png"))
